@@ -50,11 +50,17 @@ export default function CommunityPollsSection({ openRegisterModal }) {
   }, [user]);
 
   const fetchCommunityPolls = () => {
-    api.getCommunityPolls().then(setPolls).catch(() => {});
+    api.getCommunityPolls().then(data => {
+      const pollsList = Array.isArray(data) ? data : (data?.polls || []);
+      setPolls(pollsList);
+    }).catch(() => {});
   };
 
   const fetchElectionPosts = () => {
-    api.getPosts().then(setPosts).catch(() => {});
+    api.getPosts().then(data => {
+      const postsList = Array.isArray(data) ? data : (data?.posts || []);
+      setPosts(postsList);
+    }).catch(() => {});
   };
 
   const handleVoteCommunity = async (pollId, optionId) => {
@@ -78,7 +84,7 @@ export default function CommunityPollsSection({ openRegisterModal }) {
       showSuccess('📊 Community Poll Vote Saved to Cloud Firestore DB!');
 
       if (res && res.poll) {
-        setPolls(prev => prev.map(p => p.id === pollId ? res.poll : p));
+        setPolls(prev => (Array.isArray(prev) ? prev : []).map(p => p.id === pollId ? res.poll : p));
       } else {
         fetchCommunityPolls();
       }
@@ -113,6 +119,9 @@ export default function CommunityPollsSection({ openRegisterModal }) {
     }
   };
 
+  const safePolls = Array.isArray(polls) ? polls : [];
+  const safePosts = Array.isArray(posts) ? posts : [];
+
   return (
     <div style={{ marginTop: '32px', borderTop: '2px solid var(--border-main)', paddingTop: '28px' }}>
       
@@ -141,8 +150,9 @@ export default function CommunityPollsSection({ openRegisterModal }) {
 
       {/* Community Mini Issue Polls Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px', marginBottom: '32px' }}>
-        {polls.map(poll => {
-          const totalVotes = poll.options.reduce((a, b) => a + (b.votes || 0), 0);
+        {safePolls.map(poll => {
+          const pollOptions = Array.isArray(poll.options) ? poll.options : [];
+          const totalVotes = pollOptions.reduce((a, b) => a + (b.votes || 0), 0);
           const userVotedOpt = votedMap[poll.id];
 
           return (
@@ -179,7 +189,7 @@ export default function CommunityPollsSection({ openRegisterModal }) {
 
               {/* Options list */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '14px' }}>
-                {poll.options.map(opt => {
+                {pollOptions.map(opt => {
                   const pct = totalVotes > 0 ? Math.round((opt.votes / totalVotes) * 100) : 0;
                   const isSelected = userVotedOpt === opt.id;
 
@@ -241,17 +251,17 @@ export default function CommunityPollsSection({ openRegisterModal }) {
           💬 Election Discussions & Constituency Feedback
         </h3>
 
-        <PostComposer onPostCreated={(p) => setPosts([p, ...posts])} openRegisterModal={openRegisterModal} />
+        <PostComposer onPostCreated={(p) => setPosts(prev => [p, ...(Array.isArray(prev) ? prev : [])])} openRegisterModal={openRegisterModal} />
 
-        {posts.map(p => (
-          <PostCard key={p.id} post={p} onDelete={(id) => setPosts(posts.filter(item => item.id !== id))} />
+        {safePosts.map(p => (
+          <PostCard key={p.id} post={p} onDelete={(id) => setPosts(prev => (Array.isArray(prev) ? prev : []).filter(item => item.id !== id))} />
         ))}
       </div>
 
       <CreateCommunityPollModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
-        onCreated={(newPoll) => setPolls([newPoll, ...polls])} 
+        onCreated={(newPoll) => setPolls(prev => [newPoll, ...(Array.isArray(prev) ? prev : [])])} 
       />
     </div>
   );

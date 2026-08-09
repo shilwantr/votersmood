@@ -23,7 +23,8 @@ export default function Polls() {
 
     api.getOfficialElections({ category: catParam }).then(data => {
       if (isMounted) {
-        setOfficialElections(data);
+        const electionsList = Array.isArray(data) ? data : (data?.elections || []);
+        setOfficialElections(electionsList);
         setLoading(false);
       }
     }).catch(() => {
@@ -32,6 +33,8 @@ export default function Polls() {
 
     return () => { isMounted = false; };
   }, [categoryFilter]);
+
+  const safeElections = Array.isArray(officialElections) ? officialElections : [];
 
   return (
     <div className="container" style={{ padding: '32px 24px' }}>
@@ -78,7 +81,7 @@ export default function Polls() {
             </div>
           ) : (
             <div>
-              {officialElections.map(election => (
+              {safeElections.map(election => (
                 <OfficialElectionPoll 
                   key={election.id} 
                   election={election} 

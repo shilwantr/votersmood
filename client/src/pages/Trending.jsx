@@ -15,17 +15,19 @@ export default function Trending({ openRegisterModal }) {
     let isMounted = true;
     setLoading(true);
 
-    api.getTopics({ window: windowHours }).then(async (fetchedTopics) => {
+    api.getTopics({ window: windowHours }).then(async (fetchedData) => {
       if (!isMounted) return;
+      const fetchedTopics = Array.isArray(fetchedData) ? fetchedData : (fetchedData?.topics || []);
       setTopics(fetchedTopics);
 
       const postsMap = {};
       await Promise.all(
         fetchedTopics.map(async (t) => {
           try {
-            const posts = await api.getPosts({ topic: t.title, sort: 'reactions' });
+            const postsData = await api.getPosts({ topic: t.title, sort: 'reactions' });
+            const posts = Array.isArray(postsData) ? postsData : (postsData?.posts || []);
             // Sort posts by total reaction count (agreeCount + funnyCount) descending
-            const sortedPosts = (posts || []).sort((a, b) => {
+            const sortedPosts = [...posts].sort((a, b) => {
               const scoreA = (a.agreeCount || 0) + (a.funnyCount || 0);
               const scoreB = (b.agreeCount || 0) + (b.funnyCount || 0);
               return scoreB - scoreA;
@@ -50,7 +52,7 @@ export default function Trending({ openRegisterModal }) {
 
   const handlePostCreated = (topicId, newPost) => {
     setTopicPosts(prev => {
-      const existing = prev[topicId] || [];
+      const existing = Array.isArray(prev[topicId]) ? prev[topicId] : [];
       const updated = [newPost, ...existing].sort((a, b) => {
         const scoreA = (a.agreeCount || 0) + (a.funnyCount || 0);
         const scoreB = (b.agreeCount || 0) + (b.funnyCount || 0);
@@ -59,6 +61,8 @@ export default function Trending({ openRegisterModal }) {
       return { ...prev, [topicId]: updated };
     });
   };
+
+  const safeTopics = Array.isArray(topics) ? topics : [];
 
   return (
     <div className="container" style={{ padding: '32px 24px', maxWidth: '960px' }}>
@@ -97,7 +101,7 @@ export default function Trending({ openRegisterModal }) {
           <CardSkeleton />
           <CardSkeleton />
         </div>
-      ) : topics.length === 0 ? (
+      ) : safeTopics.length === 0 ? (
         <EmptyState 
           icon="📈"
           title="No Trending Topics Recorded"
@@ -107,8 +111,8 @@ export default function Trending({ openRegisterModal }) {
         />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          {topics.map((topic, index) => {
-            const posts = topicPosts[topic.id] || [];
+          {safeTopics.map((topic, index) => {
+            const posts = Array.isArray(topicPosts[topic.id]) ? topicPosts[topic.id] : [];
 
             return (
               <div 

@@ -20,10 +20,11 @@ export default function Home({ openRegisterModal }) {
       api.getLeaders({ sort: 'openQuestions' })
     ]).then(([postsData, leadersData]) => {
       if (isMounted) {
-        setPosts(postsData);
+        const postsList = Array.isArray(postsData) ? postsData : (postsData?.posts || []);
+        setPosts(postsList);
         
         // Sort leaders strictly by openQuestionsCount descending & pick top 5
-        const list = Array.isArray(leadersData) ? leadersData : (leadersData.leaders || []);
+        const list = Array.isArray(leadersData) ? leadersData : (leadersData?.leaders || []);
         const sorted = [...list].sort((a, b) => (b.openQuestionsCount || 0) - (a.openQuestionsCount || 0));
         setFeaturedLeaders(sorted.slice(0, 5));
         
@@ -37,8 +38,11 @@ export default function Home({ openRegisterModal }) {
   }, []);
 
   const handlePostCreated = (newPost) => {
-    setPosts([newPost, ...posts]);
+    setPosts(prev => [newPost, ...(Array.isArray(prev) ? prev : [])]);
   };
+
+  const safePosts = Array.isArray(posts) ? posts : [];
+  const safeFeaturedLeaders = Array.isArray(featuredLeaders) ? featuredLeaders : [];
 
   return (
     <div className="container" style={{ padding: '32px 24px' }}>
@@ -68,7 +72,7 @@ export default function Home({ openRegisterModal }) {
               <CardSkeleton />
               <CardSkeleton />
             </div>
-          ) : posts.length === 0 ? (
+          ) : safePosts.length === 0 ? (
             <EmptyState 
               icon="💬"
               title="No Discussions Posted Yet"
@@ -77,11 +81,11 @@ export default function Home({ openRegisterModal }) {
               onAction={openRegisterModal}
             />
           ) : (
-            posts.map(post => (
+            safePosts.map(post => (
               <PostCard 
                 key={post.id} 
                 post={post} 
-                onDelete={(id) => setPosts(posts.filter(p => p.id !== id))} 
+                onDelete={(id) => setPosts(prev => (Array.isArray(prev) ? prev : []).filter(p => p.id !== id))} 
               />
             ))
           )}
@@ -100,7 +104,7 @@ export default function Home({ openRegisterModal }) {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {featuredLeaders.map((l, index) => (
+              {safeFeaturedLeaders.map((l, index) => (
                 <LeaderCard 
                   key={l.id} 
                   leader={l} 
