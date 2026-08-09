@@ -1,0 +1,91 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--border-radius-sm);
+  white-space: nowrap;
+}
+
+.icon {
+  font-size: 0.75rem;
+}
+
+/* Variants */
+.default {
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.verified {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.election {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--color-info);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.leader {
+  background-color: rgba(203, 161, 53, 0.1);
+  color: var(--color-gold);
+  border: 1px solid rgba(203, 161, 53, 0.2);
+}
+
+.trending {
+  background-color: var(--color-saffron-light);
+  color: var(--color-saffron);
+  border: 1px solid rgba(232, 121, 43, 0.2);
+}
+
+/* Parties */
+.party-bjp {
+  background-color: rgba(255, 153, 51, 0.15);
+  color: var(--color-party-bjp);
+  border: 1px solid rgba(255, 153, 51, 0.3);
+}
+
+.party-inc {
+  background-color: rgba(25, 170, 237, 0.15);
+  color: var(--color-party-inc);
+  border: 1px solid rgba(25, 170, 237, 0.3);
+}
+
+.party-aap {
+  background-color: rgba(0, 114, 176, 0.15);
+  color: var(--color-party-aap);
+  border: 1px solid rgba(0, 114, 176, 0.3);
+}
+
+.party-tmc {
+  background-color: rgba(32, 198, 70, 0.15);
+  color: var(--color-party-tmc);
+  border: 1px solid rgba(32, 198, 70, 0.3);
+}
+
+.party-sp {
+  background-color: rgba(255, 34, 34, 0.15);
+  color: var(--color-party-sp);
+  border: 1px solid rgba(255, 34, 34, 0.3);
+}
+
+.party-bsp {
+  background-color: rgba(34, 64, 154, 0.15);
+  color: var(--color-party-bsp);
+  border: 1px solid rgba(34, 64, 154, 0.3);
+}
+
+.party-other {
+  background-color: rgba(102, 102, 102, 0.15);
+  color: var(--color-party-default);
+  border: 1px solid rgba(102, 102, 102, 0.3);
+}

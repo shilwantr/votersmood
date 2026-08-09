@@ -1,0 +1,50 @@
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.hoverable {
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.hoverable:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-border-light);
+  box-shadow: var(--shadow-md);
+}
+
+.padded {
+  padding: var(--spacing-md);
+}
+
+.header {
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--spacing-md);
+  margin: calc(-1 * var(--spacing-md)) calc(-1 * var(--spacing-md)) var(--spacing-md) calc(-1 * var(--spacing-md));
+}
+
+.body {
+  flex: 1;
+}
+
+.footer {
+  border-top: 1px solid var(--color-border);
+  padding: var(--spacing-md);
+  margin: var(--spacing-md) calc(-1 * var(--spacing-md)) calc(-1 * var(--spacing-md)) calc(-1 * var(--spacing-md));
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Ensure child padding logic works properly when padded is true but child sub-components are used */
+.card:not(.padded) .header {
+  margin: 0;
+}
+.card:not(.padded) .body {
+  padding: var(--spacing-md);
+}
+.card:not(.padded) .footer {
+  margin: 0;
+}

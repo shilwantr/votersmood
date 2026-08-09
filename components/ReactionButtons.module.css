@@ -1,0 +1,55 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.reactionBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  color: #222222;
+  padding: 0.35rem 0.75rem;
+  border-radius: 16px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  letter-spacing: 0.03em;
+}
+
+.reactionBtn:hover:not(:disabled) {
+  background-color: #F5F5F5;
+  border-color: #111111;
+  color: #111111;
+}
+
+.reactionBtn:active {
+  transform: scale(0.96);
+}
+
+.reactionBtn.active {
+  background-color: #111111;
+  border-color: #111111;
+  color: #FFFFFF;
+}
+
+.reactionBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.icon {
+  font-size: 0.85rem;
+}
+
+.label {
+  font-weight: 700;
+}
+
+.count {
+  font-weight: 600;
+}

@@ -1,0 +1,68 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  font-family: 'Helvetica Neue', sans-serif;
+  color: #eee;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.field label {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+.input, .select {
+  background-color: #222;
+  border: 1px solid #444;
+  color: #fff;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-family: inherit;
+}
+.input:focus, .select:focus {
+  border-color: #E8792B;
+  outline: none;
+}
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.optionRow {
+  display: flex;
+  gap: 0.5rem;
+}
+.optionRow input {
+  flex: 1;
+}
+.removeBtn {
+  background: transparent;
+  color: #ff4444;
+  border: 1px solid #444;
+  padding: 0 1rem;
+  cursor: pointer;
+}
+.addBtn {
+  align-self: flex-start;
+  background: transparent;
+  color: #E8792B;
+  border: 1px dashed #E8792B;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.checkboxGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}

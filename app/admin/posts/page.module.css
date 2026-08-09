@@ -1,0 +1,123 @@
+.container {
+  max-width: 1200px;
+}
+
+.title {
+  color: #E8792B;
+  font-size: 2rem;
+  margin-top: 0;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #333;
+  padding-bottom: 1rem;
+}
+
+.filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.filterBtn {
+  background-color: #222;
+  color: #aaa;
+  border: 1px solid #444;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.activeFilter {
+  background-color: #E8792B;
+  color: #000;
+  border: 1px solid #E8792B;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.postCard {
+  background-color: #222;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.postHeader {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.badgeApproved {
+  background-color: #4CAF50;
+  color: #fff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.badgePending {
+  background-color: #ff9800;
+  color: #fff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.postContent {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  color: #f4f4f4;
+}
+
+.meta {
+  font-size: 0.8rem;
+  color: #888;
+  font-family: 'Roboto Mono', monospace;
+  margin-bottom: 0.5rem;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  border-top: 1px solid #333;
+  padding-top: 1rem;
+}
+
+.approveBtn, .rejectBtn, .deleteBtn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.approveBtn {
+  background-color: #4CAF50;
+  color: #fff;
+}
+
+.rejectBtn {
+  background-color: #ff9800;
+  color: #fff;
+}
+
+.deleteBtn {
+  background-color: #ff4444;
+  color: #fff;
+  margin-left: auto;
+}

@@ -1,0 +1,270 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Very top black portal strip */
+.portalStrip {
+  background-color: #111111;
+  color: #DDDDDD;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 6px 0;
+  border-bottom: 1px solid #222222;
+}
+
+.portalContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.portalTitle {
+  font-weight: 500;
+  color: #EEEEEE;
+  letter-spacing: 0.02em;
+}
+
+.portalRight {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.statusText {
+  font-size: 0.7rem;
+  color: #CCCCCC;
+}
+
+.statusHighlight {
+  color: #88FF88;
+  font-weight: 600;
+}
+
+.adminToggle {
+  font-size: 0.7rem;
+  color: #999999;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background-color: #222222;
+  border: 1px solid #333333;
+}
+
+.adminToggleActive {
+  color: #FF9933;
+  border-color: #FF9933;
+}
+
+/* Secondary Gazette Tagline Strip */
+.subStrip {
+  background-color: #FAFAFA;
+  border-bottom: 1px solid #E0E0E0;
+  padding: 5px 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: #555555;
+}
+
+.subStripContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.gazetteBadge {
+  background-color: #222222;
+  color: #FFFFFF;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  border-radius: 1px;
+}
+
+.tagline {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #555555;
+}
+
+/* Main Navigation Bar */
+.mainNav {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #222222;
+  padding: 0;
+}
+
+.navContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.brandTitle {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #111111;
+  letter-spacing: -0.02em;
+}
+
+.brandSubtitleBox {
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  color: #666666;
+  border: 1px solid #DDDDDD;
+  padding: 2px 6px;
+  background-color: #F8F8F8;
+  border-radius: 2px;
+}
+
+.desktopLinks {
+  display: none;
+  align-items: center;
+  gap: 1.75rem;
+  height: 100%;
+}
+
+@media (min-width: 768px) {
+  .desktopLinks {
+    display: flex;
+  }
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #555555;
+  text-decoration: none;
+  height: 100%;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.navLink:hover {
+  color: #111111;
+}
+
+.activeNavLink {
+  color: #111111;
+  font-weight: 600;
+  border-bottom: 2px solid #111111;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.registerBtn {
+  background-color: #111111;
+  color: #FFFFFF;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 8px 16px;
+  border-radius: 2px;
+  border: 1px solid #111111;
+  transition: background-color var(--transition-fast);
+}
+
+.registerBtn:hover {
+  background-color: #333333;
+}
+
+.userMenu {
+  position: relative;
+}
+
+.avatarBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: #111111;
+  color: #FFFFFF;
+  font-family: var(--font-mono);
+  font-weight: bold;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #111111;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  background-color: #FFFFFF;
+  border: 1px solid #222222;
+  border-radius: 2px;
+  padding: 4px 0;
+  min-width: 150px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 110;
+}
+
+.dropdownItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 14px;
+  color: #111111;
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdownItem:hover {
+  background-color: #F0F0F0;
+}
+
+.mobileToggle {
+  display: block;
+  font-size: 1.4rem;
+  color: #111111;
+}
+
+@media (min-width: 768px) {
+  .mobileToggle {
+    display: none;
+  }
+}
+
+.mobileMenu {
+  border-top: 1px solid #E0E0E0;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: #FFFFFF;
+}
+
+.mobileNavLink {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 500;
+  color: #111111;
+}
