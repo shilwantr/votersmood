@@ -21,7 +21,7 @@ const PORT = process.env.PORT || 5000;
 
 // CORS setup to allow client requests
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'],
+  origin: '*',
   credentials: true
 }));
 
@@ -31,8 +31,8 @@ app.use(express.json());
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'online',
-    service: 'VotersMood Express API Backend',
-    projectId: process.env.FIREBASE_PROJECT_ID,
+    service: 'VotersMood Express API Backend (Vercel Serverless)',
+    projectId: process.env.FIREBASE_PROJECT_ID || 'votersmood78',
     timestamp: new Date().toISOString(),
     secretsIsolated: true
   });
@@ -54,9 +54,13 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message || 'Internal Server Error' });
 });
 
-app.listen(PORT, () => {
-  console.log(`\n======================================================`);
-  console.log(`🚀 VotersMood Express Backend Server running on http://localhost:${PORT}`);
-  console.log(`🔒 Project: ${process.env.FIREBASE_PROJECT_ID} (Keys 100% Server Isolated)`);
-  console.log(`======================================================\n`);
-});
+if (process.env.VERCEL !== '1' && !process.env.VERCEL_ENV) {
+  app.listen(PORT, () => {
+    console.log(`\n======================================================`);
+    console.log(`🚀 VotersMood Express Backend Server running on http://localhost:${PORT}`);
+    console.log(`🔒 Project: ${process.env.FIREBASE_PROJECT_ID || 'votersmood78'} (Keys 100% Server Isolated)`);
+    console.log(`======================================================\n`);
+  });
+}
+
+export default app;
