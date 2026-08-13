@@ -97,6 +97,15 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0 24px;
 }
 
+/* Borderless Input Utility for Typable Cards */
+input.borderless-input, textarea.borderless-input {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
 /* Responsive Breakpoint Matrix */
 @media (max-width: 1024px) {
   .two-column-grid {

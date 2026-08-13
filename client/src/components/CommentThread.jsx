@@ -162,7 +162,7 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
           {comment.content}
         </div>
 
-        {/* Comment Actions (Minimal BG ONLY if user has reacted!) */}
+        {/* Comment Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', paddingLeft: '34px' }}>
           <button 
             onClick={() => handleCommentReaction('agree')} 
@@ -214,47 +214,54 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
             ↪ REPLY
           </button>
         </div>
-      </div>
 
-      {/* Reply Input Capsule (Appears ONLY on reply click!) */}
-      {showReplyForm && (
-        <form 
-          onSubmit={handleSendReply}
-          style={{ 
-            marginLeft: '34px', 
-            marginTop: '4px',
-            backgroundColor: '#FFFFFF', 
-            border: '1px solid var(--border-subtle)', 
-            borderRadius: '8px', 
-            padding: '6px 10px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.03)'
-          }}
-        >
-          <input
-            type="text"
-            value={replyText}
-            onChange={(e) => setReplyText(e.target.value.slice(0, 50))}
-            placeholder={`Reply to ${comment.authorName} (max 50 chars)...`}
-            maxLength={50}
-            autoFocus
-            style={{ flex: 1, border: 'none', background: 'transparent', fontSize: '13px', padding: '2px 0', outline: 'none', color: 'var(--text-primary)' }}
-          />
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--text-muted)', flexShrink: 0 }}>
-            {replyText.length}/50
-          </span>
-          <button 
-            type="submit" 
-            className="btn-primary" 
-            disabled={!replyText.trim()} 
-            style={{ fontSize: '10.5px', padding: '3px 10px', borderRadius: '4px', flexShrink: 0 }}
+        {/* Seamless Borderless Reply Input (Whole card typable, NO extra borders!) */}
+        {showReplyForm && (
+          <form 
+            onSubmit={handleSendReply}
+            style={{ 
+              marginLeft: '34px', 
+              marginTop: '8px',
+              paddingTop: '6px',
+              borderTop: '1px dashed #E2E8F0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              width: 'calc(100% - 34px)'
+            }}
           >
-            Send
-          </button>
-        </form>
-      )}
+            <input
+              type="text"
+              className="borderless-input"
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value.slice(0, 50))}
+              placeholder={`Reply to ${comment.authorName} (max 50 chars)...`}
+              maxLength={50}
+              autoFocus
+              style={{ 
+                flex: 1, 
+                fontSize: '14px', 
+                padding: '6px 0', 
+                color: 'var(--text-primary)',
+                border: 'none',
+                outline: 'none',
+                background: 'transparent'
+              }}
+            />
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--text-muted)', flexShrink: 0 }}>
+              {replyText.length}/50
+            </span>
+            <button 
+              type="submit" 
+              className="btn-primary" 
+              disabled={!replyText.trim()} 
+              style={{ fontSize: '11px', padding: '4px 12px', borderRadius: '16px', flexShrink: 0 }}
+            >
+              Send
+            </button>
+          </form>
+        )}
+      </div>
 
       {/* Recursive Nested Sub-Threads */}
       {childComments.length > 0 && (
@@ -388,6 +395,7 @@ export default function CommentThread({ postId }) {
           }}
         >
           <textarea
+            className="borderless-input"
             value={newTopComment}
             onChange={(e) => setNewTopComment(e.target.value.slice(0, 500))}
             placeholder={user ? "Write an insight comment (max 500 chars)..." : "Sign in to write a comment..."}
@@ -395,7 +403,7 @@ export default function CommentThread({ postId }) {
             disabled={!user}
             autoFocus
             rows={2}
-            style={{ width: '100%', border: 'none', background: 'transparent', padding: 0, fontSize: '14px', outline: 'none', resize: 'none', color: 'var(--text-primary)' }}
+            style={{ width: '100%', border: 'none', background: 'transparent', padding: 0, fontSize: '15px', outline: 'none', resize: 'none', color: 'var(--text-primary)' }}
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '6px', borderTop: '1px solid #F1F5F9' }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--text-muted)' }}>
