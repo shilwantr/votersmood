@@ -75,27 +75,6 @@ export default function Navbar({ activeTab = 'discussions', setActiveTab }) {
     <>
       <header style={{ width: '100%', position: 'sticky', top: 0, zIndex: 100, backgroundColor: '#FFFFFF', borderBottom: '1px solid var(--border-subtle)' }}>
         
-        {/* Top Strip */}
-        <div style={{ backgroundColor: 'var(--bg-dark-monolith)', color: '#FFFFFF', padding: '5px 0', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
-          <div className="container page-main-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span className="badge badge-official" style={{ fontSize: '9px', padding: '2px 6px' }}>
-                OFFICIAL GAZETTE
-              </span>
-              <span className="gazette-top-tagline" style={{ color: '#A1A1AA', letterSpacing: '0.04em' }}>
-                POLITICAL INTELLIGENCE & VERIFIED CONSTITUENCY FEEDBACK ENGINE
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{ color: user ? '#38BDF8' : '#A1A1AA', fontSize: '10px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: user ? '#38BDF8' : '#71717A', display: 'inline-block' }}></span>
-                STATE: {user ? 'REGISTERED VOTER' : 'PUBLIC CITIZEN GUEST'}
-              </span>
-            </div>
-          </div>
-        </div>
-
         {/* Main Navigation Bar */}
         <nav style={{ height: '64px', display: 'flex', alignItems: 'center' }}>
           <div className="container page-main-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%' }}>

@@ -48,6 +48,12 @@ export default function PostComposer({ onPostCreated, openRegisterModal }) {
     }).catch(() => {});
   }, []);
 
+  const handleTextareaInput = (e) => {
+    setContent(e.target.value.slice(0, 500));
+    e.target.style.height = 'auto';
+    e.target.style.height = Math.max(48, e.target.scrollHeight) + 'px';
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
@@ -94,9 +100,11 @@ export default function PostComposer({ onPostCreated, openRegisterModal }) {
         marginBottom: '20px'
       }}
     >
+      {/* Borderless 2-Row Minimum Auto-Expanding Textarea (Same as Comment Input) */}
       <textarea
+        className="borderless-input"
         value={content}
-        onChange={(e) => setContent(e.target.value.slice(0, 500))}
+        onChange={handleTextareaInput}
         onClick={() => { if (!user && openRegisterModal) openRegisterModal(); }}
         placeholder={user ? "Write your insight or ask an open question to a leader (max 500 chars)..." : "🔒 Click to register as Verified Citizen & post an insight (max 500 chars)..."}
         disabled={isSubmitting}
@@ -104,21 +112,25 @@ export default function PostComposer({ onPostCreated, openRegisterModal }) {
         rows={2}
         style={{ 
           width: '100%', 
-          border: 'none', 
+          border: 'none !important', 
+          outline: 'none !important', 
+          boxShadow: 'none !important',
           background: 'transparent', 
-          resize: 'none', 
-          fontSize: '14px', 
+          backgroundColor: 'transparent',
+          fontSize: '15px', 
+          lineHeight: 1.5,
           color: 'var(--text-primary)', 
-          outline: 'none',
           cursor: user ? 'text' : 'pointer',
-          padding: 0,
-          lineHeight: 1.45
+          padding: '4px 0',
+          minHeight: '48px',
+          resize: 'none',
+          overflow: 'hidden'
         }}
       />
 
       {/* Open Question Section Toggle */}
       {user && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '4px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '2px' }}>
           <input
             type="checkbox"
             id="openQuestionCheck"
@@ -174,8 +186,8 @@ export default function PostComposer({ onPostCreated, openRegisterModal }) {
         </div>
       )}
 
-      {/* Action Bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '6px', borderTop: '1px solid var(--border-subtle)' }}>
+      {/* Action Bar (Clean Borderless Layout matching comment input) */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)' }}>
           {content.length}/500 CHARS MAX
         </span>
@@ -184,7 +196,7 @@ export default function PostComposer({ onPostCreated, openRegisterModal }) {
           type="submit"
           disabled={isSubmitting || (user && !content.trim())}
           className="btn-primary"
-          style={{ fontSize: '12px', height: '34px', padding: '0 16px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+          style={{ fontSize: '12px', height: '36px', padding: '0 18px', borderRadius: '18px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
         >
           <span>✈</span> {isSubmitting ? 'POSTING...' : isOpenQuestion ? 'POST OPEN QUESTION' : 'POST INSIGHT'}
         </button>
