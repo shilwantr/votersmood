@@ -99,12 +99,12 @@ export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
-        justify: 'space-between',
+        justifyContent: 'space-between',
         transition: 'transform 150ms ease, box-shadow 150ms ease'
       }}
     >
       <div>
-        {/* Header Badges Bar (Cleanly formatted without overlapping) */}
+        {/* Header Badges Bar */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '6px' }}>
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
             {rank && (
@@ -147,48 +147,52 @@ export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }
       {/* Bottom Interactive Reactions & Questions Bar */}
       <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'var(--font-mono)', fontSize: '11px', flexWrap: 'wrap', gap: '8px' }}>
         
-        {/* Interactive Reaction Buttons with Page Refresh Persistence */}
+        {/* Clean Borderless Pill Reaction Buttons */}
         <div style={{ display: 'flex', gap: '6px' }}>
           <button
             type="button"
             onClick={(e) => handleReaction(e, 'agree')}
-            className={userAgreed ? 'btn-primary' : 'btn-secondary'}
+            className="btn-secondary"
             style={{
               fontSize: '11px',
-              height: '30px',
-              padding: '0 10px',
-              borderRadius: '16px',
+              height: '32px',
+              padding: '0 12px',
+              borderRadius: '20px',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '4px',
-              backgroundColor: userAgreed ? 'var(--bg-navy-authority)' : '#FFFFFF',
-              color: userAgreed ? '#FFFFFF' : 'var(--text-primary)',
+              gap: '5px',
+              border: 'none',
+              backgroundColor: userAgreed ? '#FEF3C7' : '#F1F5F9',
+              color: userAgreed ? '#92400E' : '#334155',
+              fontWeight: userAgreed ? 700 : 500,
               transition: 'all 150ms ease',
-              transform: userAgreed ? 'scale(1.05)' : 'scale(1)'
+              transform: userAgreed ? 'scale(1.04)' : 'scale(1)'
             }}
           >
-            👍 {userAgreed ? 'AGREED' : ''} {agreeCount.toLocaleString()}
+            👍 {userAgreed ? 'AGREED' : 'AGREE'} ({agreeCount.toLocaleString()})
           </button>
 
           <button
             type="button"
             onClick={(e) => handleReaction(e, 'funny')}
-            className={userFunny ? 'btn-primary' : 'btn-secondary'}
+            className="btn-secondary"
             style={{
               fontSize: '11px',
-              height: '30px',
-              padding: '0 10px',
-              borderRadius: '16px',
+              height: '32px',
+              padding: '0 12px',
+              borderRadius: '20px',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '4px',
-              backgroundColor: userFunny ? 'var(--bg-navy-authority)' : '#FFFFFF',
-              color: userFunny ? '#FFFFFF' : 'var(--text-primary)',
+              gap: '5px',
+              border: 'none',
+              backgroundColor: userFunny ? '#E2E8F0' : '#F1F5F9',
+              color: userFunny ? '#0F172A' : '#334155',
+              fontWeight: userFunny ? 700 : 500,
               transition: 'all 150ms ease',
-              transform: userFunny ? 'scale(1.05)' : 'scale(1)'
+              transform: userFunny ? 'scale(1.04)' : 'scale(1)'
             }}
           >
-            😄 {userFunny ? 'FUNNY' : ''} {funnyCount.toLocaleString()}
+            😄 {userFunny ? 'FUNNY' : 'FUNNY'} ({funnyCount.toLocaleString()})
           </button>
         </div>
 

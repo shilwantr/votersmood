@@ -73,7 +73,6 @@ export default function PostCard({ post, onDelete }) {
   if (isDeleted) return null;
 
   // Dynamic Avatar Resolution:
-  // If the post belongs to the currently logged in user, use their active user.avatarUrl immediately!
   const isCurrentUser = user && (
     (post.authorId && post.authorId === user.uid) ||
     (post.authorName && (post.authorName === user.displayName || post.authorName === user.name || post.authorName === user.email?.split('@')[0].toUpperCase()))
@@ -165,7 +164,7 @@ export default function PostCard({ post, onDelete }) {
         </div>
       )}
 
-      {/* Action Bar */}
+      {/* Action Bar (Clean Borderless Pill Reaction Buttons) */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button 
@@ -173,34 +172,37 @@ export default function PostCard({ post, onDelete }) {
             className="btn-secondary" 
             style={{
               fontSize: '12px',
-              padding: '5px 12px',
-              display: 'flex',
+              padding: '6px 14px',
+              borderRadius: '20px',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              border: hasAgreed ? '1px solid var(--accent-primary)' : '1px solid #E0DDD7',
-              backgroundColor: hasAgreed ? '#FFF7ED' : '#FFFFFF',
-              color: hasAgreed ? 'var(--accent-primary)' : 'var(--text-primary)',
+              border: 'none',
+              backgroundColor: hasAgreed ? '#FEF3C7' : '#F1F5F9',
+              color: hasAgreed ? '#92400E' : '#334155',
               fontWeight: hasAgreed ? 700 : 500
             }}
           >
-            <span style={{ color: '#D97706' }}>👍</span> AGREE ({Math.max(0, agreeCount)})
+            <span>👍</span> AGREE ({Math.max(0, agreeCount)})
           </button>
+
           <button 
             onClick={() => handleReaction('funny')}
             className="btn-secondary" 
             style={{
               fontSize: '12px',
-              padding: '5px 12px',
-              display: 'flex',
+              padding: '6px 14px',
+              borderRadius: '20px',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              border: hasFunny ? '1px solid var(--bg-navy-authority)' : '1px solid #E0DDD7',
-              backgroundColor: hasFunny ? '#F1F5F9' : '#FFFFFF',
-              color: hasFunny ? 'var(--bg-navy-authority)' : 'var(--text-primary)',
+              border: 'none',
+              backgroundColor: hasFunny ? '#E2E8F0' : '#F1F5F9',
+              color: hasFunny ? '#0F172A' : '#334155',
               fontWeight: hasFunny ? 700 : 500
             }}
           >
-            <span style={{ color: '#5B5B5B' }}>😄</span> FUNNY ({Math.max(0, funnyCount)})
+            <span>😄</span> FUNNY ({Math.max(0, funnyCount)})
           </button>
         </div>
 

@@ -44,7 +44,7 @@
 
   /* 3. Radii & Shadows Tokens */
   --radius-card: 12px;
-  --radius-button: 8px;
+  --radius-button: 20px;
   --radius-input: 8px;
   --radius-modal: 16px;
 
@@ -220,9 +220,9 @@ h1, h2, h3, h4, h5, h6 {
 .btn-primary, .btn-authority {
   background-color: var(--bg-navy-authority);
   color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-button);
-  height: 40px;
+  border: none !important;
+  border-radius: 20px;
+  height: 38px;
   padding: 0 18px;
   font-family: var(--font-sans);
   font-size: 13px;
@@ -233,7 +233,8 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  transition: background-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: none;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
 .btn-primary:hover:not(:disabled), .btn-authority:hover:not(:disabled) {
@@ -248,7 +249,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-primary:focus-visible, .btn-authority:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.25);
 }
 
 .btn-primary:disabled, .btn-authority:disabled {
@@ -258,38 +258,37 @@ h1, h2, h3, h4, h5, h6 {
   transform: none !important;
 }
 
-/* Monochrome Secondary Button (#FFFFFF BG / #09090B Text) */
+/* Clean Borderless Secondary Button (#F1F5F9 BG / No Black Outlines) */
 .btn-secondary {
-  background-color: #FFFFFF;
+  background-color: #F1F5F9;
   color: var(--text-primary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-button);
-  height: 40px;
-  padding: 0 18px;
+  border: none !important;
+  border-radius: 20px;
+  height: 36px;
+  padding: 0 16px;
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+  box-shadow: none;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: var(--bg-surface-subtle);
-  border-color: var(--border-hover);
+  background-color: #E2E8F0;
 }
 
 .btn-secondary:active:not(:disabled) {
-  background-color: #E4E4E7;
+  background-color: #CBD5E1;
 }
 
 .btn-secondary:disabled {
-  background-color: transparent !important;
-  border-color: var(--border-subtle) !important;
+  background-color: #F8FAFC !important;
   color: var(--text-muted) !important;
   cursor: not-allowed;
 }
@@ -298,19 +297,19 @@ h1, h2, h3, h4, h5, h6 {
 .btn-ghost {
   background: transparent;
   color: var(--text-primary);
-  border: none;
+  border: none !important;
   font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: 20px;
   transition: color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .btn-ghost:hover {
   color: var(--bg-navy-authority);
-  background-color: var(--bg-surface-subtle);
+  background-color: #F1F5F9;
 }
 
 .btn-ghost:disabled {
@@ -322,8 +321,8 @@ h1, h2, h3, h4, h5, h6 {
 .btn-danger {
   background-color: var(--status-danger);
   color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-button);
+  border: none !important;
+  border-radius: 16px;
   padding: 6px 12px;
   font-family: var(--font-sans);
   font-size: 12px;
