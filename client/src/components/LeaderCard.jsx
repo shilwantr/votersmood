@@ -95,29 +95,30 @@ export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }
         backgroundColor: '#FFFFFF',
         border: '1px solid var(--border-subtle)',
         borderRadius: '12px',
-        padding: '20px',
+        padding: '16px 18px',
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
+        justify: 'space-between',
         transition: 'transform 150ms ease, box-shadow 150ms ease'
       }}
     >
       <div>
         {/* Header Badges Bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '6px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '6px' }}>
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+            {/* Rank badge: Crisp WHITE text on BLACK background */}
             {rank && (
               <span 
-                className="badge" 
                 style={{ 
                   fontSize: '10px', 
                   fontWeight: 800, 
-                  backgroundColor: 'var(--bg-dark-monolith)', 
-                  color: 'var(--accent-gold-subtle)', 
-                  border: '1px solid var(--border-dark)',
-                  padding: '3px 8px',
-                  borderRadius: '4px'
+                  fontFamily: 'var(--font-mono)',
+                  backgroundColor: '#000000', 
+                  color: '#FFFFFF', 
+                  padding: '2px 7px',
+                  borderRadius: '4px',
+                  letterSpacing: '0.04em'
                 }}
               >
                 #{rank} RANK
@@ -129,76 +130,72 @@ export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }
           <span className="badge badge-verified" style={{ fontSize: '10px' }}>{leader.type || leader.repType}</span>
         </div>
 
-        <h3 style={{ fontFamily: 'var(--font-card-title)', fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>
+        <h3 style={{ fontFamily: 'var(--font-card-title)', fontSize: '19px', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>
           {leader.name}
         </h3>
 
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11.5px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
           📍 {leader.constituency}, {leader.state}
         </div>
 
         {leader.portfolio && (
-          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: 'var(--text-muted)', margin: '0 0 16px 0', lineHeight: 1.4, fontStyle: 'italic' }}>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12.5px', color: 'var(--text-muted)', margin: '0 0 12px 0', lineHeight: 1.35, fontStyle: 'italic' }}>
             💼 {leader.portfolio}
           </p>
         )}
       </div>
 
-      {/* Bottom Interactive Reactions & Questions Bar */}
-      <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'var(--font-mono)', fontSize: '11px', flexWrap: 'wrap', gap: '8px' }}>
+      {/* Single Compact Horizontal Action Bar (Reactions Left, Open Questions Right) */}
+      <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'var(--font-mono)', fontSize: '11px', flexWrap: 'wrap', gap: '6px' }}>
         
-        {/* Clean Borderless Pill Reaction Buttons */}
-        <div style={{ display: 'flex', gap: '6px' }}>
+        {/* Minimal Transparent Reaction Buttons (Soft Tint ONLY if Reacted) */}
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <button
             type="button"
             onClick={(e) => handleReaction(e, 'agree')}
-            className="btn-secondary"
+            className="btn-ghost"
             style={{
               fontSize: '11px',
-              height: '32px',
-              padding: '0 12px',
-              borderRadius: '20px',
+              padding: userAgreed ? '2px 7px' : '0 2px',
+              borderRadius: '10px',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '5px',
+              gap: '4px',
               border: 'none',
-              backgroundColor: userAgreed ? '#FEF3C7' : '#F1F5F9',
-              color: userAgreed ? '#92400E' : '#334155',
+              backgroundColor: userAgreed ? '#FEF3C7' : 'transparent',
+              color: userAgreed ? '#92400E' : '#64748B',
               fontWeight: userAgreed ? 700 : 500,
-              transition: 'all 150ms ease',
-              transform: userAgreed ? 'scale(1.04)' : 'scale(1)'
+              transition: 'all 150ms ease'
             }}
           >
-            👍 {userAgreed ? 'AGREED' : 'AGREE'} ({agreeCount.toLocaleString()})
+            <span>👍</span> <span>{agreeCount.toLocaleString()}</span>
           </button>
 
           <button
             type="button"
             onClick={(e) => handleReaction(e, 'funny')}
-            className="btn-secondary"
+            className="btn-ghost"
             style={{
               fontSize: '11px',
-              height: '32px',
-              padding: '0 12px',
-              borderRadius: '20px',
+              padding: userFunny ? '2px 7px' : '0 2px',
+              borderRadius: '10px',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '5px',
+              gap: '4px',
               border: 'none',
-              backgroundColor: userFunny ? '#E2E8F0' : '#F1F5F9',
-              color: userFunny ? '#0F172A' : '#334155',
+              backgroundColor: userFunny ? '#F1F5F9' : 'transparent',
+              color: userFunny ? '#0F172A' : '#64748B',
               fontWeight: userFunny ? 700 : 500,
-              transition: 'all 150ms ease',
-              transform: userFunny ? 'scale(1.04)' : 'scale(1)'
+              transition: 'all 150ms ease'
             }}
           >
-            😄 {userFunny ? 'FUNNY' : 'FUNNY'} ({funnyCount.toLocaleString()})
+            <span>😄</span> <span>{funnyCount.toLocaleString()}</span>
           </button>
         </div>
 
-        {/* Open Questions Count Indicator */}
-        <span style={{ fontWeight: 600, color: 'var(--accent-copper-text)', backgroundColor: 'var(--accent-copper-bg)', border: '1px solid var(--accent-copper-border)', padding: '4px 10px', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-          <CitizenInquiry size={13} /> {leader.openQuestionsCount || 0} Open Questions
+        {/* Open Questions Count Indicator on the Right side of the Same Row */}
+        <span style={{ fontWeight: 600, fontSize: '10.5px', color: 'var(--accent-copper-text)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+          <CitizenInquiry size={12} /> {leader.openQuestionsCount || 0} Open Ques
         </span>
       </div>
     </div>
