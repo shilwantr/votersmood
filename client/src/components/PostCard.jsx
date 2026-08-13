@@ -219,23 +219,24 @@ export default function PostCard({ post, onDelete }) {
         </div>
       )}
 
-      {/* Action Bar (Removed BG from Like & Funny, icon + count only) */}
+      {/* Action Bar (Minimal background ONLY if user has reacted!) */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <button 
             onClick={() => handleReaction('agree')}
             className="btn-ghost" 
             style={{
               fontSize: '12px',
-              padding: '2px 4px',
+              padding: hasAgreed ? '2px 8px' : '2px 4px',
+              borderRadius: '12px',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '4px',
               border: 'none',
-              background: 'transparent',
-              backgroundColor: 'transparent',
-              color: hasAgreed ? '#D97706' : '#64748B',
-              fontWeight: hasAgreed ? 700 : 500
+              backgroundColor: hasAgreed ? '#FEF3C7' : 'transparent',
+              color: hasAgreed ? '#92400E' : '#64748B',
+              fontWeight: hasAgreed ? 700 : 500,
+              transition: 'all 150ms ease'
             }}
           >
             <span>👍</span> <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)' }}>{Math.max(0, agreeCount)}</span>
@@ -246,15 +247,16 @@ export default function PostCard({ post, onDelete }) {
             className="btn-ghost" 
             style={{
               fontSize: '12px',
-              padding: '2px 4px',
+              padding: hasFunny ? '2px 8px' : '2px 4px',
+              borderRadius: '12px',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '4px',
               border: 'none',
-              background: 'transparent',
-              backgroundColor: 'transparent',
+              backgroundColor: hasFunny ? '#F1F5F9' : 'transparent',
               color: hasFunny ? '#0F172A' : '#64748B',
-              fontWeight: hasFunny ? 700 : 500
+              fontWeight: hasFunny ? 700 : 500,
+              transition: 'all 150ms ease'
             }}
           >
             <span>😄</span> <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)' }}>{Math.max(0, funnyCount)}</span>

@@ -162,7 +162,7 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
           {comment.content}
         </div>
 
-        {/* Comment Actions (No background from Like & Funny, icon + count only) */}
+        {/* Comment Actions (Minimal BG ONLY if user has reacted!) */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', paddingLeft: '34px' }}>
           <button 
             onClick={() => handleCommentReaction('agree')} 
@@ -170,15 +170,16 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
             style={{
               fontSize: '12px',
               fontFamily: 'var(--font-mono)',
-              padding: '0 2px',
+              padding: hasAgreed ? '2px 8px' : '0 2px',
+              borderRadius: '10px',
               border: 'none',
-              background: 'transparent',
-              backgroundColor: 'transparent',
-              color: hasAgreed ? '#D97706' : '#64748B',
+              backgroundColor: hasAgreed ? '#FEF3C7' : 'transparent',
+              color: hasAgreed ? '#92400E' : '#64748B',
               fontWeight: hasAgreed ? 700 : 500,
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '4px'
+              gap: '4px',
+              transition: 'all 150ms ease'
             }}
           >
             👍 <span style={{ fontSize: '10px' }}>{Math.max(0, agree)}</span>
@@ -190,15 +191,16 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
             style={{
               fontSize: '12px',
               fontFamily: 'var(--font-mono)',
-              padding: '0 2px',
+              padding: hasFunny ? '2px 8px' : '0 2px',
+              borderRadius: '10px',
               border: 'none',
-              background: 'transparent',
-              backgroundColor: 'transparent',
+              backgroundColor: hasFunny ? '#F1F5F9' : 'transparent',
               color: hasFunny ? '#0F172A' : '#64748B',
               fontWeight: hasFunny ? 700 : 500,
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '4px'
+              gap: '4px',
+              transition: 'all 150ms ease'
             }}
           >
             😄 <span style={{ fontSize: '10px' }}>{Math.max(0, funny)}</span>
