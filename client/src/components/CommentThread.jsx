@@ -157,62 +157,64 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
           )}
         </div>
 
-        {/* Comment Message Text: 14px */}
-        <div style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', lineHeight: 1.5, color: '#1E293B', marginBottom: '6px', wordBreak: 'break-word', paddingLeft: '34px' }}>
+        {/* Comment Message Text: 18px */}
+        <div style={{ fontFamily: 'var(--font-sans)', fontSize: '18px', lineHeight: 1.55, color: '#1E293B', marginBottom: '8px', wordBreak: 'break-word', paddingLeft: '34px' }}>
           {comment.content}
         </div>
 
-        {/* Comment Actions (Removed AGREE & FUNNY text, showing emoji + small px count below/next) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '34px' }}>
+        {/* Comment Actions (No background from Like & Funny, icon + count only) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', paddingLeft: '34px' }}>
           <button 
             onClick={() => handleCommentReaction('agree')} 
             className="btn-ghost" 
             style={{
-              fontSize: '11px',
+              fontSize: '12px',
               fontFamily: 'var(--font-mono)',
-              padding: '2px 6px',
-              borderRadius: '4px',
-              backgroundColor: hasAgreed ? '#EFF6FF' : 'transparent',
-              color: hasAgreed ? 'var(--bg-navy-authority)' : 'var(--text-secondary)',
+              padding: '0 2px',
+              border: 'none',
+              background: 'transparent',
+              backgroundColor: 'transparent',
+              color: hasAgreed ? '#D97706' : '#64748B',
               fontWeight: hasAgreed ? 700 : 500,
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '3px'
+              gap: '4px'
             }}
           >
-            👍 <span style={{ fontSize: '9px' }}>{Math.max(0, agree)}</span>
+            👍 <span style={{ fontSize: '10px' }}>{Math.max(0, agree)}</span>
           </button>
           
           <button 
             onClick={() => handleCommentReaction('funny')} 
             className="btn-ghost" 
             style={{
-              fontSize: '11px',
+              fontSize: '12px',
               fontFamily: 'var(--font-mono)',
-              padding: '2px 6px',
-              borderRadius: '4px',
-              backgroundColor: hasFunny ? '#F8FAFC' : 'transparent',
-              color: hasFunny ? 'var(--bg-navy-authority)' : 'var(--text-secondary)',
+              padding: '0 2px',
+              border: 'none',
+              background: 'transparent',
+              backgroundColor: 'transparent',
+              color: hasFunny ? '#0F172A' : '#64748B',
               fontWeight: hasFunny ? 700 : 500,
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '3px'
+              gap: '4px'
             }}
           >
-            😄 <span style={{ fontSize: '9px' }}>{Math.max(0, funny)}</span>
+            😄 <span style={{ fontSize: '10px' }}>{Math.max(0, funny)}</span>
           </button>
 
           <button 
             onClick={() => setShowReplyForm(!showReplyForm)} 
             className="btn-ghost" 
-            style={{ fontSize: '10.5px', fontFamily: 'var(--font-mono)', padding: '0 4px', color: 'var(--bg-navy-authority)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+            style={{ fontSize: '10.5px', fontFamily: 'var(--font-mono)', padding: '0 2px', color: 'var(--bg-navy-authority)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '3px' }}
           >
             ↪ REPLY
           </button>
         </div>
       </div>
 
-      {/* Reply Input Capsule (Only appears when reply button is clicked!) */}
+      {/* Reply Input Capsule (Appears ONLY on reply click!) */}
       {showReplyForm && (
         <form 
           onSubmit={handleSendReply}
@@ -236,7 +238,7 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
             placeholder={`Reply to ${comment.authorName} (max 50 chars)...`}
             maxLength={50}
             autoFocus
-            style={{ flex: 1, border: 'none', background: 'transparent', fontSize: '12.5px', padding: '2px 0', outline: 'none', color: 'var(--text-primary)' }}
+            style={{ flex: 1, border: 'none', background: 'transparent', fontSize: '13px', padding: '2px 0', outline: 'none', color: 'var(--text-primary)' }}
           />
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--text-muted)', flexShrink: 0 }}>
             {replyText.length}/50
@@ -279,7 +281,7 @@ export default function CommentThread({ postId }) {
   const [comments, setComments] = useState([]);
   const [newTopComment, setNewTopComment] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [showMainInput, setShowMainInput] = useState(false); // Hidden by default, ONLY appears if reply/comment button clicked!
+  const [showMainInput, setShowMainInput] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -348,29 +350,27 @@ export default function CommentThread({ postId }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
       
-      {/* Reply / Comment Action Button Bar */}
-      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+      {/* Horizontally Aligned Action Row: Pen Icon Write Option & Bubble Icon Insights */}
+      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '16px' }}>
         <button 
           onClick={() => setShowMainInput(!showMainInput)}
-          className="btn-secondary" 
+          className="btn-ghost" 
           style={{ 
             fontSize: '11px', 
-            padding: '4px 12px', 
-            borderRadius: '20px', 
+            fontFamily: 'var(--font-mono)',
+            padding: '2px 4px', 
             display: 'inline-flex', 
             alignItems: 'center', 
-            gap: '5px',
-            backgroundColor: showMainInput ? '#F1F5F9' : '#FFFFFF',
-            border: '1px solid #E2E8F0',
-            color: 'var(--text-primary)',
-            fontWeight: 600
+            gap: '4px',
+            color: 'var(--bg-navy-authority)',
+            fontWeight: 700
           }}
         >
-          <span>💬</span> {showMainInput ? 'Hide Input Box' : 'Write Insight Comment'}
+          <span>✏️</span> {showMainInput ? 'Hide' : 'Write Insight'}
         </button>
       </div>
 
-      {/* Top Level Comment Input Box (ONLY APPEARS IF REPLY / COMMENT BUTTON IS CLICKED!) */}
+      {/* Top Level Comment Input Box (Appears ONLY when pen write option is clicked!) */}
       {showMainInput && (
         <form 
           onSubmit={handleTopSubmit} 
@@ -388,12 +388,12 @@ export default function CommentThread({ postId }) {
           <textarea
             value={newTopComment}
             onChange={(e) => setNewTopComment(e.target.value.slice(0, 500))}
-            placeholder={user ? "Write a top-level insight comment (max 500 chars)..." : "Sign in to write a comment (max 500 chars)..."}
+            placeholder={user ? "Write an insight comment (max 500 chars)..." : "Sign in to write a comment..."}
             maxLength={500}
             disabled={!user}
             autoFocus
             rows={2}
-            style={{ width: '100%', border: 'none', background: 'transparent', padding: 0, fontSize: '13.5px', outline: 'none', resize: 'none', color: 'var(--text-primary)' }}
+            style={{ width: '100%', border: 'none', background: 'transparent', padding: 0, fontSize: '14px', outline: 'none', resize: 'none', color: 'var(--text-primary)' }}
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '6px', borderTop: '1px solid #F1F5F9' }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--text-muted)' }}>
@@ -405,7 +405,7 @@ export default function CommentThread({ postId }) {
               disabled={!user || !newTopComment.trim()}
               style={{ fontSize: '11px', padding: '4px 12px', borderRadius: '4px' }}
             >
-              💬 SUBMIT COMMENT
+              💬 SUBMIT
             </button>
           </div>
         </form>
@@ -434,7 +434,7 @@ export default function CommentThread({ postId }) {
         </div>
       ) : (
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-muted)', padding: '4px 0', fontStyle: 'italic' }}>
-          No comments posted yet. Click 'Write Insight Comment' to start the discussion!
+          No comments posted yet. Click ✏️ Write Insight to start the discussion!
         </div>
       )}
     </div>

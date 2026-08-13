@@ -207,8 +207,8 @@ export default function PostCard({ post, onDelete }) {
         </div>
       </div>
 
-      {/* Content 14px */}
-      <div style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', lineHeight: 1.55, color: 'var(--text-primary)', marginBottom: '14px', wordBreak: 'break-word' }}>
+      {/* Content */}
+      <div style={{ fontFamily: 'var(--font-sans)', fontSize: '15px', lineHeight: 1.55, color: 'var(--text-primary)', marginBottom: '14px', wordBreak: 'break-word' }}>
         {post.content}
       </div>
 
@@ -219,25 +219,23 @@ export default function PostCard({ post, onDelete }) {
         </div>
       )}
 
-      {/* Action Bar (Removed text AGREE & FUNNY, clean emoji + small px count) */}
+      {/* Action Bar (Removed BG from Like & Funny, icon + count only) */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <button 
             onClick={() => handleReaction('agree')}
-            className="btn-secondary" 
+            className="btn-ghost" 
             style={{
               fontSize: '12px',
-              padding: '4px 12px',
-              borderRadius: '20px',
+              padding: '2px 4px',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '4px',
               border: 'none',
-              backgroundColor: hasAgreed ? '#FEF3C7' : '#F1F5F9',
-              color: hasAgreed ? '#92400E' : '#334155',
-              fontWeight: hasAgreed ? 700 : 500,
-              transform: hasAgreed ? 'scale(1.04)' : 'scale(1)',
-              transition: 'all 150ms ease'
+              background: 'transparent',
+              backgroundColor: 'transparent',
+              color: hasAgreed ? '#D97706' : '#64748B',
+              fontWeight: hasAgreed ? 700 : 500
             }}
           >
             <span>👍</span> <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)' }}>{Math.max(0, agreeCount)}</span>
@@ -245,26 +243,25 @@ export default function PostCard({ post, onDelete }) {
 
           <button 
             onClick={() => handleReaction('funny')}
-            className="btn-secondary" 
+            className="btn-ghost" 
             style={{
               fontSize: '12px',
-              padding: '4px 12px',
-              borderRadius: '20px',
+              padding: '2px 4px',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '4px',
               border: 'none',
-              backgroundColor: hasFunny ? '#E2E8F0' : '#F1F5F9',
-              color: hasFunny ? '#0F172A' : '#334155',
-              fontWeight: hasFunny ? 700 : 500,
-              transform: hasFunny ? 'scale(1.04)' : 'scale(1)',
-              transition: 'all 150ms ease'
+              background: 'transparent',
+              backgroundColor: 'transparent',
+              color: hasFunny ? '#0F172A' : '#64748B',
+              fontWeight: hasFunny ? 700 : 500
             }}
           >
             <span>😄</span> <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)' }}>{Math.max(0, funnyCount)}</span>
           </button>
         </div>
 
+        {/* Insights Count */}
         <button 
           onClick={() => setShowComments(!showComments)}
           className="btn-ghost" 
