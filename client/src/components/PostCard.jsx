@@ -111,6 +111,9 @@ export default function PostCard({ post, onDelete }) {
     || post.authorAvatar 
     || `https://api.dicebear.com/10.x/avataaars/svg?seed=${encodeURIComponent(post.authorId || post.authorName || 'voter')}`;
 
+  // 7-Day Streak Verified Tick Check
+  const showVerifiedTick = (isCurrentUser && (userProfile?.isVerifiedStreak || user?.isVerifiedStreak)) || post.isVerified === true;
+
   return (
     <div style={{ backgroundColor: '#FFFFFF', border: post.isOpenQuestion ? '2px solid var(--accent-primary)' : '1px solid #E5E2DC', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', marginBottom: '16px' }}>
       
@@ -148,11 +151,33 @@ export default function PostCard({ post, onDelete }) {
             style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-canvas)', flexShrink: 0 }} 
           />
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '13px', color: 'var(--text-primary)', textTransform: 'uppercase' }}>
                 {post.authorName || 'VERIFIED CITIZEN'}
               </span>
-              <span className="badge badge-verified" style={{ fontSize: '9px' }}>✓ VERIFIED</span>
+
+              {/* 7-Day Active Streak Tick Icon (Only shows tick ✓ when 7-day streak is active) */}
+              {showVerifiedTick && (
+                <span 
+                  title="7-Day Active Streak Citizen ✓" 
+                  style={{ 
+                    color: '#0284C7', 
+                    backgroundColor: '#E0F2FE', 
+                    borderRadius: '50%', 
+                    width: '18px', 
+                    height: '18px', 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    fontSize: '11px', 
+                    fontWeight: 800, 
+                    border: '1px solid #BAE6FD',
+                    flexShrink: 0
+                  }}
+                >
+                  ✓
+                </span>
+              )}
             </div>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
               {formatDate(post.createdAt)}
@@ -192,7 +217,7 @@ export default function PostCard({ post, onDelete }) {
         </div>
       )}
 
-      {/* Action Bar (Borderless Pill Reaction Buttons with Active Persistence) */}
+      {/* Action Bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button 

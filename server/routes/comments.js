@@ -2,6 +2,7 @@ import express from 'express';
 import { db } from '../config/firebase.js';
 import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc, query, where, increment } from 'firebase/firestore';
 import { verifyAuthToken, requireAuth } from '../middleware/auth.js';
+import { trackUserActivity } from './auth.js';
 
 const router = express.Router();
 
@@ -58,6 +59,10 @@ router.post('/', verifyAuthToken, requireAuth, async (req, res) => {
     });
   }
 
+  // Track daily user activity & check 7-day streak verification
+  const streakInfo = await trackUserActivity(req.user.email, req.user.uid);
+  const isVerified = streakInfo ? streakInfo.isVerifiedStreak : false;
+
   const newComment = {
     postId,
     parentId: parentId || null,
@@ -65,6 +70,7 @@ router.post('/', verifyAuthToken, requireAuth, async (req, res) => {
     authorId: req.user.uid,
     authorName: req.user.name || req.user.displayName || req.user.email?.split('@')[0].toUpperCase() || 'VERIFIED CITIZEN',
     authorAvatar: req.user.avatarUrl || req.user.photoURL || `https://api.dicebear.com/10.x/avataaars/svg?seed=${req.user.uid || 'voter'}`,
+    isVerified: isVerified,
     isApproved: true,
     agreeCount: 0,
     funnyCount: 0,
@@ -74,7 +80,7 @@ router.post('/', verifyAuthToken, requireAuth, async (req, res) => {
   try {
     if (db) {
       const docRef = await addDoc(collection(db, 'comments'), newComment);
-      console.log(`🔥 Firestore DB: Successfully saved comment to database [ID: ${docRef.id}]`);
+      console.log(`🔥 Firestore DB: Successfully saved comment to database [ID: ${docRef.id}] (isVerified: ${isVerified})`);
       
       // Atomically increment commentCount on post
       try {

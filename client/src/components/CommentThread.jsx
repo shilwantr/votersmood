@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 
-// Recursive Chat Bubble Component (Clean & Less Borders Layout with Dynamic User Avatar Sync)
+// Recursive Chat Bubble Component (Clean & Less Borders Layout with Dynamic User Avatar & 7-Day Tick Sync)
 function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, user, userProfile, isAdmin, level = 0 }) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyText, setReplyText] = useState('');
@@ -15,7 +15,6 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
   const childComments = allComments.filter(c => c.parentId === comment.id);
 
   // Dynamic Avatar Resolution:
-  // If the comment belongs to the currently logged in user, use their active user.avatarUrl immediately!
   const isCurrentUser = user && (
     (comment.authorId && comment.authorId === user.uid) ||
     (comment.authorName && (comment.authorName === user.displayName || comment.authorName === user.name || comment.authorName === user.email?.split('@')[0].toUpperCase()))
@@ -25,6 +24,9 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
   const avatarUrl = activeUserAvatar 
     || comment.authorAvatar 
     || `https://api.dicebear.com/10.x/avataaars/svg?seed=${encodeURIComponent(comment.authorId || comment.authorName || 'voter')}`;
+
+  // 7-Day Active Streak Tick Icon
+  const showVerifiedTick = (isCurrentUser && (userProfile?.isVerifiedStreak || user?.isVerifiedStreak)) || comment.isVerified === true;
 
   const handleCommentReaction = async (type) => {
     if (!user) {
@@ -82,7 +84,7 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: level > 0 ? '4px' : '8px' }}>
       
-      {/* Clean Minimal Comment Item (Less Borders) */}
+      {/* Clean Minimal Comment Item */}
       <div 
         style={{
           width: '100%',
@@ -112,11 +114,32 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
               <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '11.5px', color: 'var(--text-primary)' }}>
                 {comment.authorName}
               </span>
+
+              {/* 7-Day Active Streak Tick Icon */}
+              {showVerifiedTick && (
+                <span 
+                  title="7-Day Active Streak Citizen ✓" 
+                  style={{ 
+                    color: '#0284C7', 
+                    backgroundColor: '#E0F2FE', 
+                    borderRadius: '50%', 
+                    width: '16px', 
+                    height: '16px', 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    justify: 'center', 
+                    fontSize: '10px', 
+                    fontWeight: 800, 
+                    border: '1px solid #BAE6FD',
+                    flexShrink: 0
+                  }}
+                >
+                  ✓
+                </span>
+              )}
+
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-muted)' }}>
                 • {formatCommentDate(comment.createdAt)}
-              </span>
-              <span className="badge badge-verified" style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '4px' }}>
-                {isTopLevel ? 'INSIGHT' : 'MAX 50 CHARS'}
               </span>
             </div>
           </div>

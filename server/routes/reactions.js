@@ -3,6 +3,7 @@ import { db } from '../config/firebase.js';
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where } from 'firebase/firestore';
 import { verifyAuthToken, requireAuth } from '../middleware/auth.js';
 import { LEADERS_CACHE } from './leaders.js';
+import { trackUserActivity } from './auth.js';
 
 const router = express.Router();
 
@@ -43,6 +44,9 @@ router.post('/', verifyAuthToken, requireAuth, async (req, res) => {
 
   const userId = req.user.uid;
   const reactionDocId = `${userId}_${targetId}_${reactionType}`;
+
+  // Track daily user activity & check 7-day streak verification
+  await trackUserActivity(req.user.email, req.user.uid);
 
   try {
     let toggled = true;

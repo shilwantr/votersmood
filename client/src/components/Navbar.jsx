@@ -14,6 +14,8 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
   };
 
   const userAvatar = userProfile?.avatarUrl || user?.avatarUrl || `https://api.dicebear.com/10.x/avataaars/svg?seed=${user?.uid || 'voter'}`;
+  const isVerifiedStreak = userProfile?.isVerifiedStreak || user?.isVerifiedStreak;
+  const streakCount = userProfile?.streakCount || user?.streakCount || 1;
 
   return (
     <>
@@ -31,7 +33,7 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
             </div>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <span style={{ color: '#A1A1AA', fontSize: '11px', whiteSpace: 'nowrap' }}>
-                STATUS: <span style={{ color: user ? '#059669' : '#FBBF24', fontWeight: 600 }}>{user ? '🟢 REGISTERED' : '🔑 GUEST'}</span>
+                STREAK: <span style={{ color: isVerifiedStreak ? '#38BDF8' : '#FBBF24', fontWeight: 700 }}>🔥 {streakCount}d {isVerifiedStreak ? '✓ VERIFIED' : ''}</span>
               </span>
               <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '4px', backgroundColor: isAdmin ? 'var(--bg-navy-authority)' : '#18181B', border: '1px solid #27272A', color: '#FFFFFF', whiteSpace: 'nowrap' }}>
                 ADMIN: {isAdmin ? 'ON' : 'OFF'}
@@ -116,6 +118,28 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
                     <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
                       {userProfile?.displayName || user.email?.split('@')[0]}
                     </span>
+
+                    {/* 7-Day Active Streak Tick Icon */}
+                    {isVerifiedStreak && (
+                      <span 
+                        title="Verified 7-Day Streak Citizen ✓" 
+                        style={{ 
+                          color: '#0284C7', 
+                          backgroundColor: '#E0F2FE', 
+                          borderRadius: '50%', 
+                          width: '16px', 
+                          height: '16px', 
+                          display: 'inline-flex', 
+                          alignItems: 'center', 
+                          justify: 'center', 
+                          fontSize: '10px', 
+                          fontWeight: 800, 
+                          border: '1px solid #BAE6FD'
+                        }}
+                      >
+                        ✓
+                      </span>
+                    )}
                   </div>
 
                   <button onClick={logout} className="btn-secondary" style={{ height: '36px', padding: '0 12px', fontSize: '12px' }}>
@@ -150,11 +174,14 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
                 >
                   <img src={userAvatar} alt="Mobile Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#FFFFFF' }} />
                   <div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                      {userProfile?.displayName || user.email?.split('@')[0]}
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span>{userProfile?.displayName || user.email?.split('@')[0]}</span>
+                      {isVerifiedStreak && (
+                        <span style={{ color: '#0284C7', backgroundColor: '#E0F2FE', borderRadius: '50%', width: '15px', height: '15px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 800 }}>✓</span>
+                      )}
                     </div>
                     <div style={{ fontSize: '10px', color: 'var(--accent-copper-text)' }}>
-                      🎨 Tap to change 2D Avatar
+                      🎨 Tap to change 2D Avatar (Streak: 🔥 {streakCount}d)
                     </div>
                   </div>
                 </div>

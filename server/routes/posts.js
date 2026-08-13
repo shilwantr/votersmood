@@ -1,25 +1,61 @@
 import express from 'express';
 import { db } from '../config/firebase.js';
-import { collection, doc, addDoc, getDocs, getDoc, deleteDoc, updateDoc, query, orderBy } from 'firebase/firestore';
-import { verifyAuthToken, requireAuth, requireAdmin } from '../middleware/auth.js';
-import { incrementLeaderQuestionCounts } from './leaders.js';
+import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc, query, where, getDoc, increment } from 'firebase/firestore';
+import { verifyAuthToken, requireAuth } from '../middleware/auth.js';
+import { trackUserActivity } from './auth.js';
 
 const router = express.Router();
 
-let IN_MEMORY_POSTS = [];
+let IN_MEMORY_POSTS = [
+  {
+    id: 'w3k9tvLmOzjT4GxYaSkp',
+    content: 'When will the 24x7 water pipeline augmentation project in South Mumbai be fully commissioned? Citizens are experiencing low pressure during morning supply hours.',
+    authorId: 'voter_1',
+    authorName: 'SURESH PATIL',
+    authorAvatar: 'https://api.dicebear.com/10.x/avataaars/svg?seed=Suresh',
+    isVerified: true,
+    isOpenQuestion: true,
+    targetLeaderId: 'devendra-fadnavis',
+    targetLeaderName: 'Devendra Fadnavis (MLA)',
+    questionCategory: 'Water Supply',
+    responseStatus: 'pending',
+    officialResponse: null,
+    leaderTag: 'DEVENDRA FADNAVIS (MLA)',
+    topicTag: 'MAHARASHTRAELECTIONS2026',
+    poll: null,
+    agreeCount: 1,
+    funnyCount: 0,
+    commentCount: 3,
+    isApproved: true,
+    createdAt: Date.now() - 3600000,
+  }
+];
 
-// GET /api/posts - Fetch all posts from Cloud Firestore DB (Sorted by Total Reactions score when requested)
+// Helper to increment/decrement leader openQuestionsCount & pendingCount in Cloud Firestore DB
+const incrementLeaderQuestionCounts = async (leaderId, delta) => {
+  if (!db || !leaderId) return;
+  try {
+    const leaderRef = doc(db, 'leaders', leaderId);
+    await updateDoc(leaderRef, {
+      openQuestionsCount: increment(delta),
+      pendingCount: increment(delta)
+    });
+    console.log(`🔥 Firestore DB: Updated leader [${leaderId}] openQuestionsCount by ${delta}`);
+  } catch (e) {
+    console.warn(`⚠️ Leader question count update error for [${leaderId}]:`, e.message);
+  }
+};
+
+// GET /api/posts - Fetch Posts / Discussions from Cloud Firestore DB
 router.get('/', async (req, res) => {
-  const { topic, leader, leaderId, isOpenQuestion, category, sort } = req.query;
-
+  const { leaderId, isOpenQuestion, category, topic, leader, sort } = req.query;
   try {
     let posts = [];
 
     if (db) {
       try {
         const postsRef = collection(db, 'posts');
-        const q = query(postsRef, orderBy('createdAt', 'desc'));
-        const snap = await getDocs(q);
+        const snap = await getDocs(postsRef);
         posts = snap.docs.map(docSnap => {
           const d = docSnap.data();
           return {
@@ -40,7 +76,8 @@ router.get('/', async (req, res) => {
       posts = IN_MEMORY_POSTS;
     }
 
-    let filtered = posts;
+    // Filter logic
+    let filtered = [...posts];
 
     if (leaderId) {
       filtered = filtered.filter(p => p.targetLeaderId === leaderId || (p.leaderTag || '').toLowerCase().includes(leaderId.toLowerCase()));
@@ -97,6 +134,10 @@ router.post('/', verifyAuthToken, requireAuth, async (req, res) => {
     return res.status(400).json({ error: 'Post insight exceeds maximum 500 character limit' });
   }
 
+  // Track daily user activity & check 7-day streak verification
+  const streakInfo = await trackUserActivity(req.user.email, req.user.uid);
+  const isVerified = streakInfo ? streakInfo.isVerifiedStreak : false;
+
   let formattedPoll = null;
   if (poll && poll.question && Array.isArray(poll.options) && poll.options.length >= 2) {
     formattedPoll = {
@@ -119,8 +160,9 @@ router.post('/', verifyAuthToken, requireAuth, async (req, res) => {
     content: content.trim(),
     authorId: req.user.uid,
     authorName: req.user.name || req.user.displayName || req.user.email?.split('@')[0].toUpperCase() || 'VERIFIED CITIZEN',
-    authorAvatar: req.user.picture || '',
-    isVerified: true,
+    authorAvatar: req.user.avatarUrl || `https://api.dicebear.com/10.x/avataaars/svg?seed=${req.user.uid || 'voter'}`,
+    isVerified: isVerified,
+    streakCount: streakInfo?.streakCount || 1,
     isOpenQuestion: !!isOpenQuestion,
     targetLeaderId: effectiveLeaderId,
     targetLeaderName: targetLeaderName || (isOpenQuestion ? 'Devendra Fadnavis (MLA)' : null),
@@ -140,7 +182,7 @@ router.post('/', verifyAuthToken, requireAuth, async (req, res) => {
   try {
     if (db) {
       const docRef = await addDoc(collection(db, 'posts'), newPost);
-      console.log(`🔥 Firestore DB: Successfully saved new post to database [ID: ${docRef.id}]`);
+      console.log(`🔥 Firestore DB: Successfully saved new post to database [ID: ${docRef.id}] (isVerified: ${isVerified})`);
       
       // If post is an open question to a leader, increment leader's openQuestionsCount & pendingCount
       if (isOpenQuestion && effectiveLeaderId) {

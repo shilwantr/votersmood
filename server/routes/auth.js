@@ -22,6 +22,68 @@ const generateToken = (user) => {
   return `janmat_jwt_${user.isAdmin ? 'admin' : 'user'}_${Buffer.from(user.email).toString('base64')}_${Date.now()}`;
 };
 
+// Helper to record user daily activity and calculate 7-day streak
+export const trackUserActivity = async (userEmail, userUid) => {
+  const today = new Date().toISOString().split('T')[0];
+  if (!userEmail && !userUid) return { streakCount: 0, isVerifiedStreak: false };
+
+  try {
+    let userData = null;
+    let userDocId = null;
+
+    if (db) {
+      const usersRef = collection(db, 'users');
+      let q = userUid ? query(usersRef, where('uid', '==', userUid)) : query(usersRef, where('email', '==', userEmail.toLowerCase()));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        userDocId = snap.docs[0].id;
+        userData = snap.docs[0].data();
+      }
+    }
+
+    let dates = userData?.activityDates || [];
+    if (!dates.includes(today)) {
+      dates = [...dates, today];
+    }
+
+    // Sort unique dates descending YYYY-MM-DD
+    const uniqueSorted = Array.from(new Set(dates)).sort().reverse();
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+    let streak = 0;
+    if (uniqueSorted[0] === today || uniqueSorted[0] === yesterday) {
+      let current = new Date(uniqueSorted[0]);
+      for (let i = 0; i < uniqueSorted.length; i++) {
+        const expected = new Date(current);
+        expected.setDate(expected.getDate() - i);
+        const expectedStr = expected.toISOString().split('T')[0];
+
+        if (uniqueSorted.includes(expectedStr)) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+    }
+
+    const isVerifiedStreak = streak >= 7;
+
+    if (db && userDocId) {
+      const userRef = doc(db, 'users', userDocId);
+      await setDoc(userRef, {
+        activityDates: uniqueSorted.slice(0, 30),
+        streakCount: streak,
+        isVerifiedStreak
+      }, { merge: true });
+    }
+
+    return { streakCount: streak, isVerifiedStreak };
+  } catch (err) {
+    console.warn('Track activity error:', err.message);
+    return { streakCount: 0, isVerifiedStreak: false };
+  }
+};
+
 // In-memory fallback user store when Firestore database is offline
 const IN_MEMORY_USERS = new Map();
 
@@ -68,6 +130,7 @@ router.post('/register', async (req, res) => {
     const uid = 'voter_' + Date.now();
     const passwordHash = hashPassword(password);
     const defaultAvatarUrl = `https://api.dicebear.com/10.x/avataaars/svg?seed=${uid}`;
+    const todayStr = new Date().toISOString().split('T')[0];
 
     // All newly registered accounts default strictly to isAdmin: false.
     const newUserData = {
@@ -82,6 +145,9 @@ router.post('/register', async (req, res) => {
       isRegisteredVoter: isRegisteredVoter !== false,
       avatarUrl: defaultAvatarUrl,
       avatarStyle: 'avataaars',
+      activityDates: [todayStr],
+      streakCount: 1,
+      isVerifiedStreak: false,
       createdAt: new Date().toISOString()
     };
 
@@ -154,6 +220,13 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password. Incorrect password.' });
     }
 
+    // Track daily login activity & calculate streak
+    const streakInfo = await trackUserActivity(normalizedEmail, userData.uid);
+    if (streakInfo) {
+      userData.streakCount = streakInfo.streakCount;
+      userData.isVerifiedStreak = streakInfo.isVerifiedStreak;
+    }
+
     // Prepare safe user object & check strict DB isAdmin flag
     const { passwordHash: _, ...safeUser } = userData;
     safeUser.isAdmin = userData.isAdmin === true;
@@ -162,7 +235,7 @@ router.post('/login', async (req, res) => {
     }
 
     const token = generateToken(safeUser);
-    console.log(`🔥 Firebase DB: Login authenticated for [${normalizedEmail}] (isAdmin: ${safeUser.isAdmin})`);
+    console.log(`🔥 Firebase DB: Login authenticated for [${normalizedEmail}] (isAdmin: ${safeUser.isAdmin}, Streak: ${safeUser.streakCount}d)`);
 
     return res.json({
       message: 'Login successful via Firebase DB',
@@ -210,6 +283,13 @@ router.get('/me', async (req, res) => {
 
     if (!userData) {
       return res.status(404).json({ error: 'User profile not found' });
+    }
+
+    // Track activity & streak
+    const streakInfo = await trackUserActivity(email, userData.uid);
+    if (streakInfo) {
+      userData.streakCount = streakInfo.streakCount;
+      userData.isVerifiedStreak = streakInfo.isVerifiedStreak;
     }
 
     const { passwordHash: _, ...safeUser } = userData;
