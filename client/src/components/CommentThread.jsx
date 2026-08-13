@@ -2,6 +2,47 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 
+// Smart Comment Sorting Helper:
+// 1. Comments created within the last 5 minutes (300,000 ms) are pinned to the top (newest first).
+// 2. Once past 5 minutes, comments are sorted by Total Engagement Score = (agreeCount + funnyCount + childRepliesCount) DESC.
+const sortCommentsByFiveMinRule = (commentList, allCommentsList) => {
+  const FIVE_MINUTES_MS = 5 * 60 * 1000;
+  const now = Date.now();
+
+  return [...commentList].sort((a, b) => {
+    const timeA = new Date(a.createdAt || 0).getTime();
+    const timeB = new Date(b.createdAt || 0).getTime();
+    const ageA = now - timeA;
+    const ageB = now - timeB;
+
+    const isNewA = ageA <= FIVE_MINUTES_MS;
+    const isNewB = ageB <= FIVE_MINUTES_MS;
+
+    // Rule 1: Fresh comments (< 5 mins) go to the top
+    if (isNewA && !isNewB) return -1;
+    if (!isNewA && isNewB) return 1;
+
+    // Rule 2: If both are fresh (< 5 mins), newest first
+    if (isNewA && isNewB) {
+      return timeB - timeA;
+    }
+
+    // Rule 3: After 5 minutes, sort by Total Score = (agreeCount + funnyCount + childRepliesCount)
+    const childCountA = allCommentsList.filter(c => c.parentId === a.id).length;
+    const childCountB = allCommentsList.filter(c => c.parentId === b.id).length;
+
+    const scoreA = (a.agreeCount || 0) + (a.funnyCount || 0) + childCountA;
+    const scoreB = (b.agreeCount || 0) + (b.funnyCount || 0) + childCountB;
+
+    if (scoreB !== scoreA) {
+      return scoreB - scoreA;
+    }
+
+    // Fallback: newest first if score is tied
+    return timeB - timeA;
+  });
+};
+
 // Recursive Chat Bubble Component
 function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, user, userProfile, isAdmin, level = 0 }) {
   const [showReplyForm, setShowReplyForm] = useState(false);
@@ -12,7 +53,10 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
   const [hasFunny, setHasFunny] = useState(false);
 
   const isTopLevel = !comment.parentId;
-  const childComments = allComments.filter(c => c.parentId === comment.id);
+  
+  // Sort child comments using the 5-minute rule then engagement score
+  const rawChildComments = allComments.filter(c => c.parentId === comment.id);
+  const childComments = sortCommentsByFiveMinRule(rawChildComments, allComments);
 
   // Dynamic Avatar Resolution:
   const isCurrentUser = user && (
@@ -361,7 +405,9 @@ export default function CommentThread({ postId }) {
     e.target.style.height = Math.max(48, e.target.scrollHeight) + 'px';
   };
 
-  const topLevelComments = comments.filter(c => !c.parentId);
+  // Sort top-level comments using the 5-minute rule then engagement score
+  const rawTopComments = comments.filter(c => !c.parentId);
+  const topLevelComments = sortCommentsByFiveMinRule(rawTopComments, comments);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
