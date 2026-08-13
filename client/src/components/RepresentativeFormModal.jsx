@@ -32,7 +32,7 @@ export default function RepresentativeFormModal({ isOpen, onClose, onSave, editi
   // Basic Info
   const [name, setName] = useState(editingRepresentative?.name || '');
   const [displayName, setDisplayName] = useState(editingRepresentative?.displayName || '');
-  const [profilePhoto, setProfilePhoto] = useState(editingRepresentative?.profilePhoto || editingRepresentative?.profilePhotoUrl || '');
+  const [profilePhoto, setProfilePhoto] = useState(editingRepresentative?.profilePhoto || editingRepresentative?.profilePhotoUrl || editingRepresentative?.photoURL || '');
   const [gender, setGender] = useState(editingRepresentative?.gender || 'Male');
   const [dob, setDob] = useState(editingRepresentative?.dob || '');
   const [email, setEmail] = useState(editingRepresentative?.email || '');
@@ -240,6 +240,7 @@ export default function RepresentativeFormModal({ isOpen, onClose, onSave, editi
             <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', marginBottom: '12px', color: 'var(--text-primary)' }}>
               Basic Personal & Political Details
             </h3>
+            
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
               <div>
                 <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600 }}>FULL NAME *</label>
@@ -250,23 +251,29 @@ export default function RepresentativeFormModal({ isOpen, onClose, onSave, editi
                 <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600 }}>DISPLAY NAME</label>
                 <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="e.g. Devendra Fadnavis" />
               </div>
+            </div>
 
-              {/* Profile Photo Image URL Input */}
-              <div style={{ gridColumn: 'span 2' }}>
-                <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 700, color: 'var(--accent-primary)' }}>
-                  📷 REPRESENTATIVE PROFILE PHOTO / IMAGE URL
+            {/* DEDICATED PROMINENT MEDIA & PROFILE LINKS HIGHLIGHT BOX */}
+            <div style={{ backgroundColor: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: '10px', padding: '16px', margin: '14px 0', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 800, color: '#0284C7', letterSpacing: '0.05em' }}>
+                📷 REPRESENTATIVE MEDIA & PROFILE URLS
+              </div>
+
+              <div>
+                <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                  📷 PROFILE PHOTO / IMAGE URL
                 </label>
                 <input 
                   type="url" 
                   value={profilePhoto} 
                   onChange={(e) => setProfilePhoto(e.target.value)} 
                   placeholder="e.g. https://images.unsplash.com/... or https://upload.wikimedia.org/.../Devendra_Fadnavis.jpg" 
+                  style={{ width: '100%', backgroundColor: '#FFFFFF', border: '1px solid #93C5FD' }}
                 />
               </div>
 
-              {/* Official Website / Profile Link Input */}
-              <div style={{ gridColumn: 'span 2' }}>
-                <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 700, color: 'var(--accent-primary)' }}>
+              <div>
+                <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '4px' }}>
                   🔗 OFFICIAL WEBSITE / PROFILE LINK (URL)
                 </label>
                 <input 
@@ -274,9 +281,12 @@ export default function RepresentativeFormModal({ isOpen, onClose, onSave, editi
                   value={website} 
                   onChange={(e) => setWebsite(e.target.value)} 
                   placeholder="e.g. https://devendrafadnavis.in or https://rahulgandhi.in" 
+                  style={{ width: '100%', backgroundColor: '#FFFFFF', border: '1px solid #93C5FD' }}
                 />
               </div>
+            </div>
 
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
               {/* Political Party Selector + Custom Party Option */}
               <div>
                 <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600 }}>POLITICAL PARTY *</label>
