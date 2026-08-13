@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CommentThread from './CommentThread';
 import PollCard from './PollCard';
+import StreakBadge from './StreakBadge';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 
@@ -157,28 +158,8 @@ export default function PostCard({ post, onDelete }) {
                 {post.authorName || 'VERIFIED CITIZEN'}
               </span>
 
-              {/* 7-Day Active Streak Tick Icon */}
-              {showVerifiedTick && (
-                <span 
-                  title="7-Day Active Streak Citizen ✓" 
-                  style={{ 
-                    color: '#0284C7', 
-                    backgroundColor: '#E0F2FE', 
-                    borderRadius: '50%', 
-                    width: '16px', 
-                    height: '16px', 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    justify: 'center', 
-                    fontSize: '10px', 
-                    fontWeight: 800, 
-                    border: '1px solid #BAE6FD',
-                    flexShrink: 0
-                  }}
-                >
-                  ✓
-                </span>
-              )}
+              {/* Catchy 7-Day Active Streak Tick Badge with Hover Popover */}
+              {showVerifiedTick && <StreakBadge isVerified={true} size="16px" fontSize="10px" />}
             </div>
             {/* Post time 8px */}
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--text-muted)', marginTop: '2px' }}>
@@ -219,7 +200,7 @@ export default function PostCard({ post, onDelete }) {
         </div>
       )}
 
-      {/* Action Bar (Minimal background ONLY if user has reacted!) */}
+      {/* Action Bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <button 

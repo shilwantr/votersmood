@@ -1,22 +1,61 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { OfficialSeal, EditorialFeed, BallotBox, AssemblyPillar, SignalPulse } from './Icons';
 import AvatarSelectionModal from './AvatarSelectionModal';
+import StreakBadge from './StreakBadge';
 
-export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
-  const { user, userProfile, isAdmin, logout } = useAuth();
+// Official Gazette Icons
+const GazetteLogo = ({ size = 28 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
+    <path d="M18 14h-8" />
+    <path d="M15 18h-5" />
+    <path d="M10 6h8v4h-8V6Z" />
+  </svg>
+);
+
+const EditorialFeed = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+    <path d="M7 7h10" />
+    <path d="M7 11h10" />
+    <path d="M7 15h6" />
+  </svg>
+);
+
+const BallotBox = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M18 20V10M12 20V4M6 20v-6" />
+  </svg>
+);
+
+const AssemblyPillar = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M3 21h18M3 7h18M6 7v14M10 7v14M14 7v14M18 7v14M12 3l9 4H3l9-4z" />
+  </svg>
+);
+
+const SignalPulse = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+  </svg>
+);
+
+export default function Navbar({ activeTab = 'discussions', setActiveTab }) {
+  const { user, userProfile, logout, isAdmin, openRegisterModal } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-
   const dropdownRef = useRef(null);
 
-  const handleNavClick = (tabId) => {
-    setActiveTab(tabId);
-    setMobileMenuOpen(false);
-  };
+  // Dynamic Avatar Resolution:
+  const userAvatar = userProfile?.avatarUrl 
+    || user?.avatarUrl 
+    || `https://api.dicebear.com/10.x/avataaars/svg?seed=${encodeURIComponent(user?.uid || user?.displayName || 'voter')}`;
 
-  // Close profile dropdown when clicking outside
+  const isVerifiedStreak = !!(userProfile?.isVerifiedStreak || user?.isVerifiedStreak);
+  const streakCount = userProfile?.streakCount || user?.streakCount || 0;
+
+  // Close profile dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -27,50 +66,59 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const userAvatar = userProfile?.avatarUrl || user?.avatarUrl || `https://api.dicebear.com/10.x/avataaars/svg?seed=${user?.uid || 'voter'}`;
-  const isVerifiedStreak = userProfile?.isVerifiedStreak || user?.isVerifiedStreak;
-  const streakCount = userProfile?.streakCount || user?.streakCount || 1;
+  const handleNavClick = (tabId) => {
+    if (setActiveTab) setActiveTab(tabId);
+    setMobileMenuOpen(false);
+  };
 
   return (
     <>
-      <header style={{ position: 'sticky', top: 0, zIndex: 100, width: '100%' }}>
-        {/* 1. Top Gazette Header (#09090B Obsidian Black) */}
-        <div style={{ backgroundColor: '#09090B', color: '#FFFFFF', fontFamily: 'var(--font-mono)', fontSize: '11.5px', padding: '6px 0', borderBottom: '1px solid #27272A' }}>
-          <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <span style={{ backgroundColor: '#18181B', color: 'var(--accent-gold-subtle)', border: '1px solid #27272A', padding: '2px 8px', borderRadius: '4px', fontWeight: 700, fontSize: '11px', display: 'inline-flex', alignItems: 'center', gap: '5px', whiteSpace: 'nowrap' }}>
-                <OfficialSeal size={13} /> OFFICIAL GAZETTE
+      <header style={{ width: '100%', position: 'sticky', top: 0, zIndex: 100, backgroundColor: '#FFFFFF', borderBottom: '1px solid var(--border-subtle)' }}>
+        
+        {/* Top Strip */}
+        <div style={{ backgroundColor: 'var(--bg-dark-monolith)', color: '#FFFFFF', padding: '5px 0', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
+          <div className="container page-main-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="badge badge-official" style={{ fontSize: '9px', padding: '2px 6px' }}>
+                OFFICIAL GAZETTE
               </span>
-              <span className="gazette-top-tagline" style={{ color: '#A1A1AA', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                POLITICAL INTELLIGENCE & VERIFIED CONSTITUENCY ENGINE
+              <span className="gazette-top-tagline" style={{ color: '#A1A1AA', letterSpacing: '0.04em' }}>
+                POLITICAL INTELLIGENCE & VERIFIED CONSTITUENCY FEEDBACK ENGINE
               </span>
             </div>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <span style={{ color: '#A1A1AA', fontSize: '11px', whiteSpace: 'nowrap' }}>
-                STREAK: <span style={{ color: isVerifiedStreak ? '#38BDF8' : '#FBBF24', fontWeight: 700 }}>🔥 {streakCount}d {isVerifiedStreak ? '✓ VERIFIED' : ''}</span>
-              </span>
-              <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '4px', backgroundColor: isAdmin ? 'var(--bg-navy-authority)' : '#18181B', border: '1px solid #27272A', color: '#FFFFFF', whiteSpace: 'nowrap' }}>
-                ADMIN: {isAdmin ? 'ON' : 'OFF'}
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ color: user ? '#38BDF8' : '#A1A1AA', fontSize: '10px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: user ? '#38BDF8' : '#71717A', display: 'inline-block' }}></span>
+                STATE: {user ? 'REGISTERED VOTER' : 'PUBLIC CITIZEN GUEST'}
               </span>
             </div>
           </div>
         </div>
 
-        {/* 2. Main Navigation Bar (#FFFFFF, 1px solid #E4E4E7) */}
-        <nav style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid var(--border-subtle)' }}>
-          <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '60px' }}>
+        {/* Main Navigation Bar */}
+        <nav style={{ height: '64px', display: 'flex', alignItems: 'center' }}>
+          <div className="container page-main-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%' }}>
             
-            {/* Brand Logo with Cormorant Garamond Font */}
-            <div onClick={() => handleNavClick('discussions')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span className="brand-logo-text" style={{ fontFamily: 'var(--font-brand)', fontSize: '26px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>
-                THE STATE UNION
-              </span>
-              <span style={{ fontFamily: 'var(--font-serif)', fontSize: '10px', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)', padding: '1px 5px', backgroundColor: 'var(--bg-canvas)', borderRadius: '4px', whiteSpace: 'nowrap' }}>
-                जनमत
-              </span>
+            {/* Left: Brand Identity */}
+            <div 
+              onClick={() => handleNavClick('discussions')}
+              style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+            >
+              <div style={{ color: 'var(--bg-navy-authority)', display: 'flex', alignItems: 'center' }}>
+                <GazetteLogo size={26} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span className="brand-logo-text" style={{ fontFamily: 'var(--font-brand)', fontSize: '24px', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-primary)', lineHeight: 1 }}>
+                  THE STATE UNION
+                </span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.15em', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  जनमत • PUBLIC VOICE PORTAL
+                </span>
+              </div>
             </div>
 
-            {/* Desktop Nav Links */}
+            {/* Desktop Center Links */}
             <div className="desktop-nav" style={{ display: 'flex', gap: '28px', height: '100%', alignItems: 'center' }}>
               {[
                 { id: 'discussions', label: 'Discussions', icon: EditorialFeed },
@@ -143,27 +191,8 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
                       {userProfile?.displayName || user.email?.split('@')[0]}
                     </span>
 
-                    {/* 7-Day Active Streak Tick Icon */}
-                    {isVerifiedStreak && (
-                      <span 
-                        title="Verified 7-Day Streak Citizen ✓" 
-                        style={{ 
-                          color: '#0284C7', 
-                          backgroundColor: '#E0F2FE', 
-                          borderRadius: '50%', 
-                          width: '16px', 
-                          height: '16px', 
-                          display: 'inline-flex', 
-                          alignItems: 'center', 
-                          justify: 'center', 
-                          fontSize: '10px', 
-                          fontWeight: 800, 
-                          border: '1px solid #BAE6FD'
-                        }}
-                      >
-                        ✓
-                      </span>
-                    )}
+                    {/* Catchy 7-Day Active Streak Tick Badge with Hover Popover */}
+                    {isVerifiedStreak && <StreakBadge isVerified={true} size="16px" fontSize="10px" />}
 
                     <span style={{ fontSize: '10px', color: 'var(--text-muted)', marginLeft: '2px' }}>
                       {profileDropdownOpen ? '▲' : '▼'}
@@ -202,8 +231,9 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
                       {/* Citizen Details Strip */}
                       <div style={{ backgroundColor: '#F8FAFC', borderRadius: '6px', padding: '8px 10px', marginBottom: '8px', fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#475569', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <div>📍 {userProfile?.constituency || 'Mumbai South'}, {userProfile?.state || 'MH'}</div>
-                        <div style={{ color: isVerifiedStreak ? '#0284C7' : '#D97706', fontWeight: 700 }}>
-                          🔥 Streak: {streakCount} Days {isVerifiedStreak ? '✓ Verified Citizen' : '(Active)'}
+                        <div style={{ color: isVerifiedStreak ? '#0284C7' : '#D97706', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span>🔥 Streak: {streakCount} Days</span>
+                          <StreakBadge isVerified={isVerifiedStreak} size="15px" fontSize="9px" />
                         </div>
                       </div>
 
@@ -258,9 +288,7 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
                   <div>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span>{userProfile?.displayName || user.email?.split('@')[0]}</span>
-                      {isVerifiedStreak && (
-                        <span style={{ color: '#0284C7', backgroundColor: '#E0F2FE', borderRadius: '50%', width: '15px', height: '15px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 800 }}>✓</span>
-                      )}
+                      {isVerifiedStreak && <StreakBadge isVerified={true} size="15px" fontSize="9px" />}
                     </div>
                     <div style={{ fontSize: '10px', color: 'var(--accent-copper-text)' }}>
                       🎨 Tap to change 2D Avatar (Streak: 🔥 {streakCount}d)

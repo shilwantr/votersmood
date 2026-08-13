@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
+import StreakBadge from './StreakBadge';
 
 // Smart Comment Sorting Helper:
 // 1. Comments created within the last 5 minutes (300,000 ms) are pinned to the top (newest first).
@@ -160,28 +161,8 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
                 {comment.authorName}
               </span>
 
-              {/* 7-Day Active Streak Tick Icon */}
-              {showVerifiedTick && (
-                <span 
-                  title="7-Day Active Streak Citizen ✓" 
-                  style={{ 
-                    color: '#0284C7', 
-                    backgroundColor: '#E0F2FE', 
-                    borderRadius: '50%', 
-                    width: '15px', 
-                    height: '15px', 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    justify: 'center', 
-                    fontSize: '10px', 
-                    fontWeight: 800, 
-                    border: '1px solid #BAE6FD',
-                    flexShrink: 0
-                  }}
-                >
-                  ✓
-                </span>
-              )}
+              {/* Catchy 7-Day Active Streak Tick Badge with Hover Popover */}
+              {showVerifiedTick && <StreakBadge isVerified={true} size="15px" fontSize="9px" />}
 
               {/* Time: 8px */}
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--text-muted)' }}>
