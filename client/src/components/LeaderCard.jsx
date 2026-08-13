@@ -88,6 +88,17 @@ export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }
     });
   };
 
+  const handleOpenExternalWebsite = (e) => {
+    e.stopPropagation(); // Prevent card selection navigation
+    if (leader.website) {
+      let url = leader.website.trim();
+      if (!/^https?:\/\//i.test(url)) {
+        url = `https://${url}`;
+      }
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <div
       onClick={() => onSelect && onSelect(leader.id)}
@@ -128,7 +139,33 @@ export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }
             <span className="badge badge-featured" style={{ fontSize: '10px' }}>{leader.party}</span>
           </div>
 
-          <span className="badge badge-verified" style={{ fontSize: '10px' }}>{leader.type || leader.repType}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {/* Official Website Link Button */}
+            {leader.website && (
+              <button
+                type="button"
+                onClick={handleOpenExternalWebsite}
+                title={`Visit Official Website: ${leader.website}`}
+                className="btn-ghost"
+                style={{
+                  fontSize: '10px',
+                  fontFamily: 'var(--font-mono)',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  border: '1px solid #CBD5E1',
+                  color: '#0284C7',
+                  backgroundColor: '#F0F9FF',
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '3px'
+                }}
+              >
+                🔗 Website
+              </button>
+            )}
+            <span className="badge badge-verified" style={{ fontSize: '10px' }}>{leader.type || leader.repType}</span>
+          </div>
         </div>
 
         <h3 style={{ fontFamily: 'var(--font-card-title)', fontSize: '19px', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>

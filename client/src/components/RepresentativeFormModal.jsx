@@ -147,7 +147,7 @@ export default function RepresentativeFormModal({ isOpen, onClose, onSave, editi
       dob,
       email,
       phone,
-      website,
+      website: website.trim(),
       biography,
       party: finalParty,
       status,
@@ -249,6 +249,19 @@ export default function RepresentativeFormModal({ isOpen, onClose, onSave, editi
               <div>
                 <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600 }}>DISPLAY NAME</label>
                 <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="e.g. Devendra Fadnavis" />
+              </div>
+
+              {/* Official Website / Profile Link Input */}
+              <div style={{ gridColumn: 'span 2' }}>
+                <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 700, color: 'var(--accent-primary)' }}>
+                  🔗 OFFICIAL WEBSITE / PROFILE LINK (URL)
+                </label>
+                <input 
+                  type="url" 
+                  value={website} 
+                  onChange={(e) => setWebsite(e.target.value)} 
+                  placeholder="e.g. https://devendrafadnavis.in or https://rahulgandhi.in" 
+                />
               </div>
 
               {/* Political Party Selector + Custom Party Option */}

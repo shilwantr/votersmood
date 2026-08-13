@@ -66,6 +66,14 @@ export default function LeaderDetail({ leaderId, onBack }) {
     };
   }, [leaderId, sortOption, categoryFilter, statusFilter]);
 
+  const handleOpenWebsite = () => {
+    if (leader?.website) {
+      let url = leader.website.trim();
+      if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <div className="container page-main-container" style={{ padding: '32px 24px', maxWidth: '1000px' }}>
       
@@ -84,12 +92,23 @@ export default function LeaderDetail({ leaderId, onBack }) {
               </div>
 
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px', flexWrap: 'wrap' }}>
                   <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '28px', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
                     {leader.name}
                   </h1>
                   <span className="badge badge-featured">{leader.party}</span>
                   <span className="badge badge-verified">{leader.type}</span>
+                  
+                  {/* Official Website Link Button */}
+                  {leader.website && (
+                    <button
+                      onClick={handleOpenWebsite}
+                      className="btn-ghost"
+                      style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#0284C7', backgroundColor: '#F0F9FF', border: '1px solid #BAE6FD', padding: '3px 8px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}
+                    >
+                      🌐 Official Profile Website
+                    </button>
+                  )}
                 </div>
 
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', color: 'var(--text-secondary)' }}>

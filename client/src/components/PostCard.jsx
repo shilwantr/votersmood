@@ -187,7 +187,7 @@ export default function PostCard({ post, onDelete }) {
           {!post.isOpenQuestion && post.leaderTag && (
             <span 
               onClick={() => handleLeaderTagClick(post.leaderTag)}
-              style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)', backgroundColor: 'var(--bg-canvas)', padding: '3px 8px', borderRadius: '4px', textTransform: 'uppercase', cursor: 'pointer' }}
+              style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)', backgroundColor: 'var(--bg-canvas)', padding: '3px 8px', borderRadius: '4px', textTransform: 'uppercase', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
             >
               📍 {post.leaderTag}
             </span>
