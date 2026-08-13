@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CommentThread from './CommentThread';
 import PollCard from './PollCard';
 import { api } from '../api/client';
@@ -13,6 +13,38 @@ export default function PostCard({ post, onDelete }) {
   const [hasFunny, setHasFunny] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
 
+  useEffect(() => {
+    setAgreeCount(Math.max(0, post.agreeCount || 0));
+    setFunnyCount(Math.max(0, post.funnyCount || 0));
+  }, [post.agreeCount, post.funnyCount]);
+
+  // Load user post reaction state across page reloads
+  useEffect(() => {
+    if (!user || !post.id) return;
+
+    const cacheKey = `janmat_post_rxn_${user.uid}_${post.id}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (parsed.agree !== undefined) setHasAgreed(parsed.agree);
+        if (parsed.funny !== undefined) setHasFunny(parsed.funny);
+      } catch (e) {}
+    }
+
+    // Query Cloud Firestore DB for active user reaction receipts
+    api.getUserReactions().then(res => {
+      if (res && res.userReactions && res.userReactions[post.id]) {
+        const rxns = res.userReactions[post.id];
+        const hasAgree = !!rxns.agree;
+        const hasFunny = !!rxns.funny;
+        setHasAgreed(hasAgree);
+        setHasFunny(hasFunny);
+        localStorage.setItem(cacheKey, JSON.stringify({ agree: hasAgree, funny: hasFunny }));
+      }
+    }).catch(() => {});
+  }, [user, post.id]);
+
   const formatDate = (timestamp) => {
     if (!timestamp) return 'RECENT';
     const date = new Date(timestamp);
@@ -22,30 +54,26 @@ export default function PostCard({ post, onDelete }) {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
   };
 
-  // Enforce strict 1-reaction limit per user per post
+  // Enforce strict 1-reaction limit per user per post with local cache persistence
   const handleReaction = async (type) => {
     if (!user) {
       alert('Please sign in or register to react to political insights.');
       return;
     }
 
+    const cacheKey = `janmat_post_rxn_${user.uid}_${post.id}`;
+
     try {
       if (type === 'agree') {
-        if (hasAgreed) {
-          setHasAgreed(false);
-          setAgreeCount(prev => Math.max(0, prev - 1));
-        } else {
-          setHasAgreed(true);
-          setAgreeCount(prev => prev + 1);
-        }
+        const newAgreeState = !hasAgreed;
+        setHasAgreed(newAgreeState);
+        setAgreeCount(prev => (newAgreeState ? prev + 1 : Math.max(0, prev - 1)));
+        localStorage.setItem(cacheKey, JSON.stringify({ agree: newAgreeState, funny: hasFunny }));
       } else if (type === 'funny') {
-        if (hasFunny) {
-          setHasFunny(false);
-          setFunnyCount(prev => Math.max(0, prev - 1));
-        } else {
-          setHasFunny(true);
-          setFunnyCount(prev => prev + 1);
-        }
+        const newFunnyState = !hasFunny;
+        setHasFunny(newFunnyState);
+        setFunnyCount(prev => (newFunnyState ? prev + 1 : Math.max(0, prev - 1)));
+        localStorage.setItem(cacheKey, JSON.stringify({ agree: hasAgreed, funny: newFunnyState }));
       }
 
       const res = await api.toggleReaction({ targetId: post.id, targetType: 'post', reactionType: type });
@@ -164,7 +192,7 @@ export default function PostCard({ post, onDelete }) {
         </div>
       )}
 
-      {/* Action Bar (Clean Borderless Pill Reaction Buttons) */}
+      {/* Action Bar (Borderless Pill Reaction Buttons with Active Persistence) */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button 
@@ -180,10 +208,12 @@ export default function PostCard({ post, onDelete }) {
               border: 'none',
               backgroundColor: hasAgreed ? '#FEF3C7' : '#F1F5F9',
               color: hasAgreed ? '#92400E' : '#334155',
-              fontWeight: hasAgreed ? 700 : 500
+              fontWeight: hasAgreed ? 700 : 500,
+              transform: hasAgreed ? 'scale(1.04)' : 'scale(1)',
+              transition: 'all 150ms ease'
             }}
           >
-            <span>👍</span> AGREE ({Math.max(0, agreeCount)})
+            <span>👍</span> {hasAgreed ? 'AGREED ✓' : 'AGREE'} ({Math.max(0, agreeCount)})
           </button>
 
           <button 
@@ -199,10 +229,12 @@ export default function PostCard({ post, onDelete }) {
               border: 'none',
               backgroundColor: hasFunny ? '#E2E8F0' : '#F1F5F9',
               color: hasFunny ? '#0F172A' : '#334155',
-              fontWeight: hasFunny ? 700 : 500
+              fontWeight: hasFunny ? 700 : 500,
+              transform: hasFunny ? 'scale(1.04)' : 'scale(1)',
+              transition: 'all 150ms ease'
             }}
           >
-            <span>😄</span> FUNNY ({Math.max(0, funnyCount)})
+            <span>😄</span> {hasFunny ? 'FUNNY ✓' : 'FUNNY'} ({Math.max(0, funnyCount)})
           </button>
         </div>
 
