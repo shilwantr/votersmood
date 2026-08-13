@@ -78,9 +78,9 @@ export default function PollCard({ poll }) {
           transition: 'all 300ms ease'
         }}
       >
-        {/* Poll Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Poll Header Top Row Aligned Right */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
               {pollState.authorName || 'Official Gazette Poll Engine'}
             </span>
@@ -88,9 +88,35 @@ export default function PollCard({ poll }) {
               <span className="badge badge-featured">ADMIN OFFICIAL</span>
             )}
           </div>
-          {isElectionPoll && (
-            <span className="badge badge-live">LIVE ELECTION POLL</span>
-          )}
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            {isElectionPoll && (
+              <span className="badge badge-live">LIVE ELECTION POLL</span>
+            )}
+
+            {/* Broadcast Loudspeaker Share Poll Button in Top Row Right Hand Side */}
+            <button
+              onClick={() => setIsShareOpen(true)}
+              className="btn-ghost"
+              title="Share Polls"
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '11px',
+                color: '#0284C7',
+                backgroundColor: '#F0F9FF',
+                border: '1px solid #BAE6FD',
+                borderRadius: '6px',
+                padding: '3px 8px',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                cursor: 'pointer'
+              }}
+            >
+              <span style={{ fontSize: '13px' }}>📢</span> Share Polls
+            </button>
+          </div>
         </div>
 
         {/* Question */}
@@ -166,25 +192,14 @@ export default function PollCard({ poll }) {
           })}
         </div>
 
-        {/* Poll Breakdown Footer + Share Button */}
+        {/* Poll Breakdown Footer */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-divider)', paddingTop: '10px', fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-muted)', flexWrap: 'wrap', gap: '8px' }}>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <span>TOTAL VOTES: {totalVotes}</span>
-            {isElectionPoll && (
-              <span>
-                RESIDENTS: <strong style={{ color: 'var(--accent-primary)' }}>{pollState.residentVotes || 980}</strong>
-              </span>
-            )}
-          </div>
-
-          {/* Share Poll Button */}
-          <button
-            onClick={() => setIsShareOpen(true)}
-            className="btn-ghost"
-            style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#0284C7', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '2px 6px' }}
-          >
-            <span>📤</span> SHARE POLL
-          </button>
+          <span>TOTAL VOTES: {totalVotes}</span>
+          {isElectionPoll && (
+            <span>
+              RESIDENTS: <strong style={{ color: 'var(--accent-primary)' }}>{pollState.residentVotes || 980}</strong>
+            </span>
+          )}
         </div>
       </div>
 

@@ -203,9 +203,9 @@ export default function OfficialElectionPoll({ election, openRegisterModal }) {
           transition: 'all 300ms ease'
         }}
       >
-        {/* Fixed Top Official Badge Banner */}
+        {/* TOP ROW ALIGNED WITH OTHER THINGS ON RIGHT HAND SIDE */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <span className="badge badge-featured" style={{ fontSize: '11px', padding: '4px 8px' }}>
               🏛 OFFICIAL ELECTION POLL (ADMIN CONTROLLED)
             </span>
@@ -220,19 +220,34 @@ export default function OfficialElectionPoll({ election, openRegisterModal }) {
             )}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {/* Share Election Poll Button */}
-            <button
-              onClick={() => setIsShareOpen(true)}
-              className="btn-ghost"
-              style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#0284C7', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '2px 6px' }}
-            >
-              <span>📤</span> SHARE ELECTION POLL
-            </button>
-
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-muted)' }}>
               CATEGORY: {activePoll?.category?.toUpperCase() || 'NATIONAL'} ELECTION
             </span>
+
+            {/* Broadcast Loudspeaker Share Poll Button in Top Row Right Hand Side */}
+            <button
+              onClick={() => setIsShareOpen(true)}
+              className="btn-ghost"
+              title="Share Polls"
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '11px',
+                color: '#0284C7',
+                backgroundColor: '#F0F9FF',
+                border: '1px solid #BAE6FD',
+                borderRadius: '6px',
+                padding: '4px 10px',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                cursor: 'pointer',
+                transition: 'all 150ms ease'
+              }}
+            >
+              <span style={{ fontSize: '13px' }}>📢</span> Share Polls
+            </button>
           </div>
         </div>
 
