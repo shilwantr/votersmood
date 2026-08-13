@@ -67,6 +67,7 @@ router.post('/register', async (req, res) => {
 
     const uid = 'voter_' + Date.now();
     const passwordHash = hashPassword(password);
+    const defaultAvatarUrl = `https://api.dicebear.com/10.x/avataaars/svg?seed=${uid}`;
 
     // All newly registered accounts default strictly to isAdmin: false.
     const newUserData = {
@@ -79,6 +80,8 @@ router.post('/register', async (req, res) => {
       state: state || 'MH',
       constituency: constituency || 'Mumbai South',
       isRegisteredVoter: isRegisteredVoter !== false,
+      avatarUrl: defaultAvatarUrl,
+      avatarStyle: 'avataaars',
       createdAt: new Date().toISOString()
     };
 
@@ -154,6 +157,9 @@ router.post('/login', async (req, res) => {
     // Prepare safe user object & check strict DB isAdmin flag
     const { passwordHash: _, ...safeUser } = userData;
     safeUser.isAdmin = userData.isAdmin === true;
+    if (!safeUser.avatarUrl) {
+      safeUser.avatarUrl = `https://api.dicebear.com/10.x/avataaars/svg?seed=${safeUser.uid || 'citizen'}`;
+    }
 
     const token = generateToken(safeUser);
     console.log(`🔥 Firebase DB: Login authenticated for [${normalizedEmail}] (isAdmin: ${safeUser.isAdmin})`);
@@ -208,10 +214,82 @@ router.get('/me', async (req, res) => {
 
     const { passwordHash: _, ...safeUser } = userData;
     safeUser.isAdmin = userData.isAdmin === true;
+    if (!safeUser.avatarUrl) {
+      safeUser.avatarUrl = `https://api.dicebear.com/10.x/avataaars/svg?seed=${safeUser.uid || 'citizen'}`;
+    }
 
     return res.json({ user: safeUser });
   } catch (error) {
     res.status(401).json({ error: 'Authentication check failed' });
+  }
+});
+
+// 4. PUT /api/auth/profile/avatar (Updates user's custom 2D avatar in Cloud Firestore DB)
+router.put('/profile/avatar', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const parts = token.split('_');
+    const emailBase64 = parts[3];
+    if (!emailBase64) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    const email = Buffer.from(emailBase64, 'base64').toString('utf-8').toLowerCase().trim();
+    const { avatarUrl, avatarStyle } = req.body;
+
+    if (!avatarUrl) {
+      return res.status(400).json({ error: 'Avatar URL is required' });
+    }
+
+    let userDocId = null;
+    let existingData = null;
+
+    if (db) {
+      try {
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('email', '==', email));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          userDocId = snap.docs[0].id;
+          existingData = snap.docs[0].data();
+          const userRef = doc(db, 'users', userDocId);
+          await setDoc(userRef, { avatarUrl, avatarStyle: avatarStyle || 'avataaars' }, { merge: true });
+          console.log(`🔥 Firebase DB: Updated 2D avatar for [${email}]`);
+        }
+      } catch (dbErr) {
+        console.warn('⚠️ Firestore update avatar warning:', dbErr.message);
+      }
+    }
+
+    if (IN_MEMORY_USERS.has(email)) {
+      const memUser = IN_MEMORY_USERS.get(email);
+      memUser.avatarUrl = avatarUrl;
+      memUser.avatarStyle = avatarStyle || 'avataaars';
+      IN_MEMORY_USERS.set(email, memUser);
+      existingData = memUser;
+    }
+
+    const updatedUser = {
+      ...(existingData || {}),
+      avatarUrl,
+      avatarStyle: avatarStyle || 'avataaars'
+    };
+
+    delete updatedUser.passwordHash;
+
+    return res.json({
+      success: true,
+      message: '2D Avatar updated successfully in DB',
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error('Avatar update error:', error);
+    res.status(500).json({ error: error.message || 'Failed to update avatar' });
   }
 });
 

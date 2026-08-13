@@ -10,6 +10,7 @@ const AuthContext = createContext({
   login: async () => {},
   signup: async () => {},
   loginWithGoogle: async () => {},
+  updateUserAvatar: async () => {},
   logout: () => {},
 });
 
@@ -128,6 +129,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUserAvatar = async (avatarUrl, avatarStyle = 'avataaars') => {
+    try {
+      const res = await api.updateAvatar({ avatarUrl, avatarStyle });
+      if (res && res.user) {
+        setUser(res.user);
+        setUserProfile(res.user);
+        localStorage.setItem('janmat_user', JSON.stringify(res.user));
+        return res.user;
+      }
+    } catch (error) {
+      console.error('Update avatar error:', error);
+      throw error;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('janmat_token');
     localStorage.removeItem('janmat_user');
@@ -137,7 +153,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, userProfile, isAdmin, loading, login, signup, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, userProfile, isAdmin, loading, login, signup, loginWithGoogle, updateUserAvatar, logout }}>
       {children}
     </AuthContext.Provider>
   );
