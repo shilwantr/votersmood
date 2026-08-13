@@ -18,6 +18,7 @@ export let LEADERS_CACHE = [
     portfolios: ['External Affairs', 'Defense'],
     governmentPositions: ['Leader of Opposition'],
     website: 'https://rahulgandhi.in',
+    profilePhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
     status: 'Active',
     gender: 'Male',
     seatType: 'General',
@@ -41,6 +42,7 @@ export let LEADERS_CACHE = [
     portfolios: ['Home Affairs', 'Health', 'Land & Land Reforms'],
     governmentPositions: ['Chief Minister'],
     website: 'https://aitcofficial.org',
+    profilePhoto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80',
     status: 'Active',
     gender: 'Female',
     seatType: 'General',
@@ -64,6 +66,7 @@ export let LEADERS_CACHE = [
     portfolios: ['Home Affairs', 'Energy', 'Housing'],
     governmentPositions: ['Deputy Chief Minister'],
     website: 'https://devendrafadnavis.in',
+    profilePhoto: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=150&q=80',
     status: 'Active',
     gender: 'Male',
     seatType: 'General',
@@ -87,6 +90,7 @@ export let LEADERS_CACHE = [
     portfolios: ['Rural Development', 'Agriculture'],
     governmentPositions: ['Party President'],
     website: 'https://samajwadiparty.in',
+    profilePhoto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80',
     status: 'Active',
     gender: 'Male',
     seatType: 'General',
@@ -110,6 +114,7 @@ export let LEADERS_CACHE = [
     portfolios: ['Road Transport', 'Highways', 'MSME'],
     governmentPositions: ['Cabinet Minister'],
     website: 'https://nitingadkari.org.in',
+    profilePhoto: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80',
     status: 'Active',
     gender: 'Male',
     seatType: 'General',
@@ -133,6 +138,7 @@ export let LEADERS_CACHE = [
     portfolios: ['External Affairs', 'IT', 'Education'],
     governmentPositions: ['Committee Chairman'],
     website: 'https://shashitharoor.in',
+    profilePhoto: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80',
     status: 'Active',
     gender: 'Male',
     seatType: 'General',
@@ -346,8 +352,8 @@ router.post('/', verifyAuthToken, requireAdmin, async (req, res) => {
     email: data.email || '',
     phone: data.phone || '',
     website: data.website || '',
+    profilePhoto: data.profilePhoto || data.profilePhotoUrl || '',
     biography: data.biography || '',
-    profilePhoto: data.profilePhoto || '',
     status: data.status || 'Active',
     verificationStatus: data.verificationStatus || 'Verified',
 
@@ -402,6 +408,7 @@ router.put('/:id', verifyAuthToken, requireAdmin, async (req, res) => {
   const updatedLeader = {
     ...data,
     id,
+    profilePhoto: data.profilePhoto || data.profilePhotoUrl || '',
     portfolio: (data.portfolios && data.portfolios.length > 0) ? data.portfolios.join(', ') : (data.portfolio || 'Elected Representative')
   };
 

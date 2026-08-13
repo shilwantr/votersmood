@@ -32,7 +32,7 @@ export default function RepresentativeFormModal({ isOpen, onClose, onSave, editi
   // Basic Info
   const [name, setName] = useState(editingRepresentative?.name || '');
   const [displayName, setDisplayName] = useState(editingRepresentative?.displayName || '');
-  const [profilePhoto, setProfilePhoto] = useState(editingRepresentative?.profilePhoto || '');
+  const [profilePhoto, setProfilePhoto] = useState(editingRepresentative?.profilePhoto || editingRepresentative?.profilePhotoUrl || '');
   const [gender, setGender] = useState(editingRepresentative?.gender || 'Male');
   const [dob, setDob] = useState(editingRepresentative?.dob || '');
   const [email, setEmail] = useState(editingRepresentative?.email || '');
@@ -142,7 +142,7 @@ export default function RepresentativeFormModal({ isOpen, onClose, onSave, editi
     const payload = {
       name: name.trim(),
       displayName: displayName.trim() || name.trim(),
-      profilePhoto,
+      profilePhoto: profilePhoto.trim(),
       gender,
       dob,
       email,
@@ -249,6 +249,19 @@ export default function RepresentativeFormModal({ isOpen, onClose, onSave, editi
               <div>
                 <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600 }}>DISPLAY NAME</label>
                 <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="e.g. Devendra Fadnavis" />
+              </div>
+
+              {/* Profile Photo Image URL Input */}
+              <div style={{ gridColumn: 'span 2' }}>
+                <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 700, color: 'var(--accent-primary)' }}>
+                  📷 REPRESENTATIVE PROFILE PHOTO / IMAGE URL
+                </label>
+                <input 
+                  type="url" 
+                  value={profilePhoto} 
+                  onChange={(e) => setProfilePhoto(e.target.value)} 
+                  placeholder="e.g. https://images.unsplash.com/... or https://upload.wikimedia.org/.../Devendra_Fadnavis.jpg" 
+                />
               </div>
 
               {/* Official Website / Profile Link Input */}

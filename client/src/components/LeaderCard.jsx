@@ -99,6 +99,8 @@ export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }
     }
   };
 
+  const photoUrl = leader.profilePhoto || leader.profilePhotoUrl || leader.photoURL;
+
   return (
     <div
       onClick={() => onSelect && onSelect(leader.id)}
@@ -168,16 +170,33 @@ export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }
           </div>
         </div>
 
-        <h3 style={{ fontFamily: 'var(--font-card-title)', fontSize: '19px', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>
-          {leader.name}
-        </h3>
+        {/* Leader Profile Photo & Title Row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
+          {photoUrl ? (
+            <img 
+              src={photoUrl} 
+              alt={leader.name} 
+              style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--border-subtle)', flexShrink: 0, backgroundColor: '#F8FAFC' }} 
+            />
+          ) : (
+            <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: 'var(--bg-navbar)', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-serif)', fontSize: '18px', fontWeight: 700, flexShrink: 0 }}>
+              {leader.name?.charAt(0)}
+            </div>
+          )}
 
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11.5px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-          📍 {leader.constituency}, {leader.state}
+          <div>
+            <h3 style={{ fontFamily: 'var(--font-card-title)', fontSize: '19px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+              {leader.name}
+            </h3>
+
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11.5px', color: 'var(--text-secondary)' }}>
+              📍 {leader.constituency}, {leader.state}
+            </div>
+          </div>
         </div>
 
         {leader.portfolio && (
-          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12.5px', color: 'var(--text-muted)', margin: '0 0 12px 0', lineHeight: 1.35, fontStyle: 'italic' }}>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12.5px', color: 'var(--text-muted)', margin: '6px 0 12px 0', lineHeight: 1.35, fontStyle: 'italic' }}>
             💼 {leader.portfolio}
           </p>
         )}

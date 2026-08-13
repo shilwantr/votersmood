@@ -74,6 +74,8 @@ export default function LeaderDetail({ leaderId, onBack }) {
     }
   };
 
+  const photoUrl = leader?.profilePhoto || leader?.profilePhotoUrl || leader?.photoURL;
+
   return (
     <div className="container page-main-container" style={{ padding: '32px 24px', maxWidth: '1000px' }}>
       
@@ -87,9 +89,17 @@ export default function LeaderDetail({ leaderId, onBack }) {
         <div style={{ backgroundColor: '#FFFFFF', border: '1px solid var(--border-main)', borderRadius: 'var(--radius-card)', padding: '24px', marginBottom: '24px', boxShadow: '0 2px 12px rgba(0,0,0,0.03)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-              <div style={{ width: '64px', height: '64px', borderRadius: '8px', backgroundColor: 'var(--bg-navbar)', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-serif)', fontSize: '28px', fontWeight: 700 }}>
-                {leader.name?.charAt(0)}
-              </div>
+              {photoUrl ? (
+                <img 
+                  src={photoUrl} 
+                  alt={leader.name} 
+                  style={{ width: '68px', height: '68px', borderRadius: '12px', objectFit: 'cover', border: '1px solid var(--border-subtle)', backgroundColor: '#F8FAFC', flexShrink: 0 }} 
+                />
+              ) : (
+                <div style={{ width: '68px', height: '68px', borderRadius: '12px', backgroundColor: 'var(--bg-navbar)', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-serif)', fontSize: '30px', fontWeight: 700, flexShrink: 0 }}>
+                  {leader.name?.charAt(0)}
+                </div>
+              )}
 
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px', flexWrap: 'wrap' }}>
