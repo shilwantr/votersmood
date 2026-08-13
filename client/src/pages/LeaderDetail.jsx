@@ -37,8 +37,11 @@ export default function LeaderDetail({ leaderId, onBack }) {
       ]).then(([leaderData, postsData]) => {
         if (isMounted) {
           setLeader(leaderData);
+          if (leaderData?.name) {
+            document.title = `${leaderData.name} (${leaderData.party} • ${leaderData.constituency}) - JanMat Gazette`;
+          }
           
-          let filtered = postsData.filter(p => p.isOpenQuestion === true || p.targetLeaderId === leaderId);
+          let filtered = postsData.filter(p => p.isOpenQuestion === true || p.targetLeaderId === leaderId || p.targetLeaderId === leaderData?.id);
           if (statusFilter === 'Answered') filtered = filtered.filter(p => p.responseStatus === 'answered');
           if (statusFilter === 'Unanswered') filtered = filtered.filter(p => p.responseStatus === 'pending');
           
@@ -64,9 +67,9 @@ export default function LeaderDetail({ leaderId, onBack }) {
   }, [leaderId, sortOption, categoryFilter, statusFilter]);
 
   return (
-    <div className="container" style={{ padding: '32px 24px', maxWidth: '1000px' }}>
+    <div className="container page-main-container" style={{ padding: '32px 24px', maxWidth: '1000px' }}>
       
-      {/* Back Navigation Bar */}
+      {/* SEO Friendly Back Navigation Bar */}
       <button onClick={onBack} className="btn-ghost" style={{ marginBottom: '16px', fontSize: '13px', fontFamily: 'var(--font-mono)' }}>
         ← BACK TO ELECTED REPRESENTATIVES DIRECTORY
       </button>

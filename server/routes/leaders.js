@@ -268,24 +268,37 @@ router.get('/', async (req, res) => {
   res.json(filtered);
 });
 
-// GET /api/leaders/:id (Instant Server Lookup)
+// GET /api/leaders/:id (Instant SEO Slug / ID Server Lookup)
 router.get('/:id', async (req, res) => {
-  const id = req.params.id;
+  const param = req.params.id;
+  const cleanSlug = param.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
 
   if (db) {
     try {
-      const snap = await getDoc(doc(db, 'leaders', id));
+      const snap = await getDoc(doc(db, 'leaders', param));
       if (snap.exists()) {
         return res.json({ id: snap.id, ...snap.data() });
+      }
+
+      const snapSlug = await getDoc(doc(db, 'leaders', cleanSlug));
+      if (snapSlug.exists()) {
+        return res.json({ id: snapSlug.id, ...snapSlug.data() });
       }
     } catch (e) {}
   }
 
-  const leader = LEADERS_CACHE.find(l => l.id === id);
+  // Fallback to in-memory lookup by ID or normalized name slug
+  const leader = LEADERS_CACHE.find(l => 
+    l.id === param || 
+    l.id === cleanSlug ||
+    (l.name && l.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-') === cleanSlug) ||
+    (l.name && l.name.toLowerCase().includes(param.toLowerCase()))
+  );
+
   if (!leader) {
     return res.json({
-      id: id,
-      name: id.replace(/-/g, ' ').toUpperCase(),
+      id: cleanSlug,
+      name: param.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
       party: 'INDEPENDENT',
       state: 'MH',
       constituency: 'Constituency Registry',

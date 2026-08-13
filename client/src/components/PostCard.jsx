@@ -55,6 +55,14 @@ export default function PostCard({ post, onDelete }) {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
   };
 
+  const handleLeaderTagClick = (tagText) => {
+    if (!tagText) return;
+    const cleanName = tagText.split('(')[0].trim();
+    const slug = cleanName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    window.history.pushState({}, '', `/${slug}`);
+    window.dispatchEvent(new Event('popstate'));
+  };
+
   // Enforce strict 1-reaction limit per user per post with local cache persistence
   const handleReaction = async (type) => {
     if (!user) {
@@ -125,7 +133,10 @@ export default function PostCard({ post, onDelete }) {
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 800, color: 'var(--accent-primary)', letterSpacing: '0.04em' }}>
               ❓ OPEN QUESTION
             </span>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-primary)', fontWeight: 600 }}>
+            <span 
+              onClick={() => handleLeaderTagClick(post.targetLeaderName || post.leaderTag)}
+              style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-primary)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}
+            >
               To: {post.targetLeaderName || post.leaderTag}
             </span>
           </div>
@@ -170,7 +181,10 @@ export default function PostCard({ post, onDelete }) {
 
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
           {!post.isOpenQuestion && post.leaderTag && (
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)', backgroundColor: 'var(--bg-canvas)', padding: '3px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
+            <span 
+              onClick={() => handleLeaderTagClick(post.leaderTag)}
+              style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)', backgroundColor: 'var(--bg-canvas)', padding: '3px 8px', borderRadius: '4px', textTransform: 'uppercase', cursor: 'pointer' }}
+            >
               📍 {post.leaderTag}
             </span>
           )}
