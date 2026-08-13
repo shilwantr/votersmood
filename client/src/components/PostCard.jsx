@@ -5,7 +5,7 @@ import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 
 export default function PostCard({ post, onDelete }) {
-  const { user, isAdmin } = useAuth();
+  const { user, userProfile, isAdmin } = useAuth();
   const [showComments, setShowComments] = useState(true);
   const [agreeCount, setAgreeCount] = useState(Math.max(0, post.agreeCount || 0));
   const [funnyCount, setFunnyCount] = useState(Math.max(0, post.funnyCount || 0));
@@ -72,7 +72,17 @@ export default function PostCard({ post, onDelete }) {
 
   if (isDeleted) return null;
 
-  const authorAvatarUrl = post.authorAvatar || `https://api.dicebear.com/10.x/avataaars/svg?seed=${encodeURIComponent(post.authorId || post.authorName || 'voter')}`;
+  // Dynamic Avatar Resolution:
+  // If the post belongs to the currently logged in user, use their active user.avatarUrl immediately!
+  const isCurrentUser = user && (
+    (post.authorId && post.authorId === user.uid) ||
+    (post.authorName && (post.authorName === user.displayName || post.authorName === user.name || post.authorName === user.email?.split('@')[0].toUpperCase()))
+  );
+
+  const activeUserAvatar = isCurrentUser ? (userProfile?.avatarUrl || user?.avatarUrl) : null;
+  const authorAvatarUrl = activeUserAvatar 
+    || post.authorAvatar 
+    || `https://api.dicebear.com/10.x/avataaars/svg?seed=${encodeURIComponent(post.authorId || post.authorName || 'voter')}`;
 
   return (
     <div style={{ backgroundColor: '#FFFFFF', border: post.isOpenQuestion ? '2px solid var(--accent-primary)' : '1px solid #E5E2DC', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', marginBottom: '16px' }}>

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 
-// Recursive Chat Bubble Component (Clean & Less Borders Layout)
-function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, user, isAdmin, level = 0 }) {
+// Recursive Chat Bubble Component (Clean & Less Borders Layout with Dynamic User Avatar Sync)
+function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, user, userProfile, isAdmin, level = 0 }) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [agree, setAgree] = useState(Math.max(0, comment.agreeCount || 0));
@@ -14,8 +14,17 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
   const isTopLevel = !comment.parentId;
   const childComments = allComments.filter(c => c.parentId === comment.id);
 
-  // Dynamic Avatar fallback
-  const avatarUrl = comment.authorAvatar || `https://api.dicebear.com/10.x/avataaars/svg?seed=${encodeURIComponent(comment.authorId || comment.authorName || 'voter')}`;
+  // Dynamic Avatar Resolution:
+  // If the comment belongs to the currently logged in user, use their active user.avatarUrl immediately!
+  const isCurrentUser = user && (
+    (comment.authorId && comment.authorId === user.uid) ||
+    (comment.authorName && (comment.authorName === user.displayName || comment.authorName === user.name || comment.authorName === user.email?.split('@')[0].toUpperCase()))
+  );
+
+  const activeUserAvatar = isCurrentUser ? (userProfile?.avatarUrl || user?.avatarUrl) : null;
+  const avatarUrl = activeUserAvatar 
+    || comment.authorAvatar 
+    || `https://api.dicebear.com/10.x/avataaars/svg?seed=${encodeURIComponent(comment.authorId || comment.authorName || 'voter')}`;
 
   const handleCommentReaction = async (type) => {
     if (!user) {
@@ -128,7 +137,7 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
           {comment.content}
         </div>
 
-        {/* Comment Actions (Subtle & Clean) */}
+        {/* Comment Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '34px' }}>
           <button 
             onClick={() => handleCommentReaction('agree')} 
@@ -210,7 +219,7 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
         </form>
       )}
 
-      {/* Recursive Nested Sub-Threads (Subtle Left Thread Line) */}
+      {/* Recursive Nested Sub-Threads */}
       {childComments.length > 0 && (
         <div style={{ paddingLeft: '18px', borderLeft: '2px solid #E2E8F0', marginLeft: '12px', marginTop: '2px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {childComments.map(child => (
@@ -221,6 +230,7 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
               onReplySubmit={onReplySubmit}
               onDeleteComment={onDeleteComment}
               user={user}
+              userProfile={userProfile}
               isAdmin={isAdmin}
               level={level + 1}
             />
@@ -232,7 +242,7 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
 }
 
 export default function CommentThread({ postId }) {
-  const { user, isAdmin } = useAuth();
+  const { user, userProfile, isAdmin } = useAuth();
   const [comments, setComments] = useState([]);
   const [newTopComment, setNewTopComment] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -261,7 +271,8 @@ export default function CommentThread({ postId }) {
       const created = await api.createComment({
         postId,
         parentId: parentId || null,
-        content: text.trim()
+        content: text.trim(),
+        authorAvatar: userProfile?.avatarUrl || user?.avatarUrl
       });
       setComments(prev => [...prev, created]);
     } catch (e) {
@@ -291,7 +302,7 @@ export default function CommentThread({ postId }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
       
-      {/* Sleek Top Level Comment Input Box (Clean Border) */}
+      {/* Sleek Top Level Comment Input Box */}
       <form 
         onSubmit={handleTopSubmit} 
         style={{ 
@@ -343,6 +354,7 @@ export default function CommentThread({ postId }) {
               onReplySubmit={(parentId, text) => handleAddComment(parentId, text)}
               onDeleteComment={handleDeleteComment}
               user={user}
+              userProfile={userProfile}
               isAdmin={isAdmin}
               level={0}
             />
