@@ -64,8 +64,8 @@ export default function PostCard({ post, onDelete }) {
     window.dispatchEvent(new Event('popstate'));
   };
 
-  // Enforce strict 1-reaction limit per user per post with local cache persistence
-  const handleReaction = async (type) => {
+  // Ultra-Fast 0ms Optimistic UI Reaction Toggle Engine for Posts
+  const handleReaction = (type) => {
     if (!user) {
       alert('Please sign in or register to react to political insights.');
       return;
@@ -73,27 +73,30 @@ export default function PostCard({ post, onDelete }) {
 
     const cacheKey = `janmat_post_rxn_${user.uid}_${post.id}`;
 
-    try {
-      if (type === 'agree') {
-        const newAgreeState = !hasAgreed;
-        setHasAgreed(newAgreeState);
-        setAgreeCount(prev => (newAgreeState ? prev + 1 : Math.max(0, prev - 1)));
-        localStorage.setItem(cacheKey, JSON.stringify({ agree: newAgreeState, funny: hasFunny }));
-      } else if (type === 'funny') {
-        const newFunnyState = !hasFunny;
-        setHasFunny(newFunnyState);
-        setFunnyCount(prev => (newFunnyState ? prev + 1 : Math.max(0, prev - 1)));
-        localStorage.setItem(cacheKey, JSON.stringify({ agree: hasAgreed, funny: newFunnyState }));
-      }
-
-      const res = await api.toggleReaction({ targetId: post.id, targetType: 'post', reactionType: type });
-      if (res && typeof res.newCount === 'number') {
-        if (type === 'agree') setAgreeCount(Math.max(0, res.newCount));
-        if (type === 'funny') setFunnyCount(Math.max(0, res.newCount));
-      }
-    } catch (e) {
-      console.warn('Reaction error:', e);
+    // 1. INSTANT OPTIMISTIC UI MUTATION (0ms)
+    if (type === 'agree') {
+      const nextAgreed = !hasAgreed;
+      setHasAgreed(nextAgreed);
+      setAgreeCount(prev => (nextAgreed ? prev + 1 : Math.max(0, prev - 1)));
+      localStorage.setItem(cacheKey, JSON.stringify({ agree: nextAgreed, funny: hasFunny }));
+    } else if (type === 'funny') {
+      const nextFunny = !hasFunny;
+      setHasFunny(nextFunny);
+      setFunnyCount(prev => (nextFunny ? prev + 1 : Math.max(0, prev - 1)));
+      localStorage.setItem(cacheKey, JSON.stringify({ agree: hasAgreed, funny: nextFunny }));
     }
+
+    // 2. BACKGROUND ASYNC DB SYNC (Non-blocking)
+    api.toggleReaction({ targetId: post.id, targetType: 'post', reactionType: type })
+      .then(res => {
+        if (res && typeof res.newCount === 'number') {
+          if (type === 'agree') setAgreeCount(Math.max(0, res.newCount));
+          if (type === 'funny') setFunnyCount(Math.max(0, res.newCount));
+        }
+      })
+      .catch(e => {
+        console.warn('Background post reaction sync warning:', e);
+      });
   };
 
   const handleDeletePost = async () => {
@@ -215,7 +218,7 @@ export default function PostCard({ post, onDelete }) {
         </div>
       )}
 
-      {/* Action Bar (Compact number formatting k and mn) */}
+      {/* Action Bar (Instant 0ms Optimistic UI) */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <button 

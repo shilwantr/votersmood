@@ -13,7 +13,6 @@ export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }
   const [funnyCount, setFunnyCount] = useState(leader.funnyCount || 0);
   const [userAgreed, setUserAgreed] = useState(false);
   const [userFunny, setUserFunny] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setAgreeCount(leader.agreeCount || 0);
@@ -47,7 +46,8 @@ export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }
     }).catch(() => {});
   }, [user, leader.id]);
 
-  const handleReaction = async (e, reactionType) => {
+  // Ultra-Fast 0ms Optimistic UI Reaction Toggle Engine
+  const handleReaction = (e, reactionType) => {
     e.stopPropagation(); // Prevent card navigation when clicking reaction buttons
 
     if (!user) {
@@ -56,36 +56,36 @@ export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }
       return;
     }
 
-    if (isSubmitting) return;
+    const cacheKey = `janmat_leader_rxn_${user.uid}_${leader.id}`;
 
-    setIsSubmitting(true);
-    try {
-      const res = await api.toggleReaction({
-        targetId: leader.id,
-        targetType: 'leader',
-        reactionType
-      });
-
-      const cacheKey = `janmat_leader_rxn_${user.uid}_${leader.id}`;
-
-      if (reactionType === 'agree') {
-        setUserAgreed(res.toggled);
-        setAgreeCount(res.newCount);
-        const cacheVal = { agree: res.toggled, funny: userFunny };
-        localStorage.setItem(cacheKey, JSON.stringify(cacheVal));
-        showSuccess(res.toggled ? `👍 Agreed with ${leader.name}!` : `Removed Agree reaction`);
-      } else {
-        setUserFunny(res.toggled);
-        setFunnyCount(res.newCount);
-        const cacheVal = { agree: userAgreed, funny: res.toggled };
-        localStorage.setItem(cacheKey, JSON.stringify(cacheVal));
-        showSuccess(res.toggled ? `😄 Reacted Funny to ${leader.name}!` : `Removed Funny reaction`);
-      }
-    } catch (err) {
-      showError('Reaction error');
-    } finally {
-      setIsSubmitting(false);
+    // 1. INSTANT OPTIMISTIC UI MUTATION (0ms)
+    if (reactionType === 'agree') {
+      const nextAgreed = !userAgreed;
+      setUserAgreed(nextAgreed);
+      setAgreeCount(prev => (nextAgreed ? prev + 1 : Math.max(0, prev - 1)));
+      localStorage.setItem(cacheKey, JSON.stringify({ agree: nextAgreed, funny: userFunny }));
+      showSuccess(nextAgreed ? `👍 Agreed with ${leader.name}!` : `Removed Agree reaction`);
+    } else if (reactionType === 'funny') {
+      const nextFunny = !userFunny;
+      setUserFunny(nextFunny);
+      setFunnyCount(prev => (nextFunny ? prev + 1 : Math.max(0, prev - 1)));
+      localStorage.setItem(cacheKey, JSON.stringify({ agree: userAgreed, funny: nextFunny }));
+      showSuccess(nextFunny ? `😄 Reacted Funny to ${leader.name}!` : `Removed Funny reaction`);
     }
+
+    // 2. BACKGROUND ASYNC DB SYNC (Non-blocking)
+    api.toggleReaction({
+      targetId: leader.id,
+      targetType: 'leader',
+      reactionType
+    }).then(res => {
+      if (res && typeof res.newCount === 'number') {
+        if (reactionType === 'agree') setAgreeCount(Math.max(0, res.newCount));
+        if (reactionType === 'funny') setFunnyCount(Math.max(0, res.newCount));
+      }
+    }).catch(err => {
+      console.warn('Background leader reaction sync warning:', err);
+    });
   };
 
   return (
@@ -149,7 +149,7 @@ export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }
       {/* Single Compact Horizontal Action Bar (Reactions Left, Open Questions Right) */}
       <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'var(--font-mono)', fontSize: '11px', flexWrap: 'wrap', gap: '6px' }}>
         
-        {/* Minimal Transparent Reaction Buttons (k for thousands, mn for millions) */}
+        {/* Minimal Transparent Reaction Buttons (Instant 0ms Optimistic UI) */}
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <button
             type="button"

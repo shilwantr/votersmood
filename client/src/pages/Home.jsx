@@ -53,11 +53,18 @@ export default function Home({ openRegisterModal }) {
     setPosts(prev => [newPost, ...(Array.isArray(prev) ? prev : [])]);
   };
 
+  // SEO-friendly Navigation for Featured Leaders in Home Discussions Sidebar (e.g. /devendra-fadnavis)
+  const handleSelectLeader = (leaderIdOrSlug) => {
+    const cleanSlug = String(leaderIdOrSlug).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+    window.history.pushState({}, '', `/${cleanSlug}`);
+    window.dispatchEvent(new Event('popstate'));
+  };
+
   const safePosts = Array.isArray(posts) ? posts : [];
   const safeFeaturedLeaders = Array.isArray(featuredLeaders) ? featuredLeaders : [];
 
   return (
-    <div className="container" style={{ padding: '32px 24px' }}>
+    <div className="container page-main-container" style={{ padding: '32px 24px' }}>
       
       {/* Title Header Card */}
       <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-main)', borderRadius: 'var(--radius-card)', padding: '24px', marginBottom: '28px', boxShadow: 'var(--shadow-card)' }}>
@@ -121,6 +128,7 @@ export default function Home({ openRegisterModal }) {
                   key={l.id} 
                   leader={l} 
                   rank={index + 1} 
+                  onSelect={handleSelectLeader}
                   openRegisterModal={openRegisterModal}
                 />
               ))}
