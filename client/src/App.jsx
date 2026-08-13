@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './components/Toast';
 import Navbar from './components/Navbar';
 import RegisterModal from './components/RegisterModal';
@@ -13,9 +13,9 @@ import Admin from './pages/Admin';
 const KNOWN_TABS = ['discussions', 'polls', 'directory', 'trending', 'admin'];
 
 function AppContent() {
+  const { isRegisterOpen, openRegisterModal, closeRegisterModal } = useAuth();
   const [activeTab, setActiveTab] = useState('discussions');
   const [selectedLeaderSlug, setSelectedLeaderSlug] = useState(null);
-  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
   // Sync client route with window.location.pathname for SEO Friendly Leader URLs (e.g. /devendra-fadnavis)
   useEffect(() => {
@@ -64,11 +64,11 @@ function AppContent() {
       <Navbar 
         activeTab={activeTab} 
         setActiveTab={handleTabChange} 
-        openRegisterModal={() => setIsRegisterOpen(true)}
+        openRegisterModal={openRegisterModal}
       />
 
       <main style={{ flex: 1 }}>
-        {activeTab === 'discussions' && <Home openRegisterModal={() => setIsRegisterOpen(true)} />}
+        {activeTab === 'discussions' && <Home openRegisterModal={openRegisterModal} />}
         {activeTab === 'polls' && <Polls />}
         {activeTab === 'directory' && <Leaders onSelectLeader={handleSelectLeader} />}
         {activeTab === 'leader-detail' && selectedLeaderSlug && (
@@ -77,7 +77,7 @@ function AppContent() {
             onBack={() => handleTabChange('directory')} 
           />
         )}
-        {activeTab === 'trending' && <Trending openRegisterModal={() => setIsRegisterOpen(true)} />}
+        {activeTab === 'trending' && <Trending openRegisterModal={openRegisterModal} />}
         {activeTab === 'admin' && <Admin />}
       </main>
 
@@ -87,7 +87,7 @@ function AppContent() {
         </div>
       </footer>
 
-      <RegisterModal isOpen={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} />
+      <RegisterModal isOpen={isRegisterOpen} onClose={closeRegisterModal} />
     </div>
   );
 }

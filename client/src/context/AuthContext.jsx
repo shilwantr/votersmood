@@ -7,6 +7,9 @@ const AuthContext = createContext({
   userProfile: null,
   isAdmin: false,
   loading: true,
+  isRegisterOpen: false,
+  openRegisterModal: () => {},
+  closeRegisterModal: () => {},
   login: async () => {},
   signup: async () => {},
   loginWithGoogle: async () => {},
@@ -19,6 +22,10 @@ export const AuthProvider = ({ children }) => {
   const [userProfile, setUserProfile] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+
+  const openRegisterModal = () => setIsRegisterOpen(true);
+  const closeRegisterModal = () => setIsRegisterOpen(false);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -56,6 +63,7 @@ export const AuthProvider = ({ children }) => {
         setUser(res.user);
         setUserProfile(res.user);
         setIsAdmin(res.user.isAdmin === true);
+        setIsRegisterOpen(false);
         return res.user;
       }
     } catch (error) {
@@ -81,6 +89,7 @@ export const AuthProvider = ({ children }) => {
         setUser(res.user);
         setUserProfile(res.user);
         setIsAdmin(res.user.isAdmin === true);
+        setIsRegisterOpen(false);
         return res.user;
       }
     } catch (error) {
@@ -121,6 +130,7 @@ export const AuthProvider = ({ children }) => {
         setUser(res.user);
         setUserProfile(res.user);
         setIsAdmin(res.user.isAdmin === true);
+        setIsRegisterOpen(false);
         return res.user;
       }
     } catch (error) {
@@ -153,7 +163,20 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, userProfile, isAdmin, loading, login, signup, loginWithGoogle, updateUserAvatar, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      userProfile, 
+      isAdmin, 
+      loading, 
+      isRegisterOpen, 
+      openRegisterModal, 
+      closeRegisterModal, 
+      login, 
+      signup, 
+      loginWithGoogle, 
+      updateUserAvatar, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );

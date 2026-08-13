@@ -40,12 +40,14 @@ const SignalPulse = ({ size = 18 }) => (
   </svg>
 );
 
-export default function Navbar({ activeTab = 'discussions', setActiveTab }) {
-  const { user, userProfile, logout, isAdmin, openRegisterModal } = useAuth();
+export default function Navbar({ activeTab = 'discussions', setActiveTab, openRegisterModal: propOpenRegisterModal }) {
+  const { user, userProfile, logout, isAdmin, openRegisterModal: contextOpenRegisterModal } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const handleRegisterClick = propOpenRegisterModal || contextOpenRegisterModal;
 
   // Dynamic Avatar Resolution:
   const userAvatar = userProfile?.avatarUrl 
@@ -238,7 +240,7 @@ export default function Navbar({ activeTab = 'discussions', setActiveTab }) {
                   )}
                 </div>
               ) : (
-                <button onClick={openRegisterModal} className="btn-primary" style={{ height: '36px', padding: '0 16px', fontSize: '13px' }}>
+                <button onClick={handleRegisterClick} className="btn-primary" style={{ height: '36px', padding: '0 16px', fontSize: '13px' }}>
                   REGISTER VOTER
                 </button>
               )}
@@ -320,7 +322,7 @@ export default function Navbar({ activeTab = 'discussions', setActiveTab }) {
                     🚪 Sign Out ({user.email?.split('@')[0]})
                   </button>
                 ) : (
-                  <button onClick={() => { openRegisterModal(); setMobileMenuOpen(false); }} className="btn-primary" style={{ width: '100%', height: '38px', fontSize: '13px' }}>
+                  <button onClick={() => { if (handleRegisterClick) handleRegisterClick(); setMobileMenuOpen(false); }} className="btn-primary" style={{ width: '100%', height: '38px', fontSize: '13px' }}>
                     🔑 REGISTER VOTER
                   </button>
                 )}
