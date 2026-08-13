@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 import StreakBadge from './StreakBadge';
+import { formatCompactNumber } from '../utils/formatters';
 
 // Smart Comment Sorting Helper:
 // 1. Comments created within the last 5 minutes (300,000 ms) are pinned to the top (newest first).
@@ -207,7 +208,7 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
               transition: 'all 150ms ease'
             }}
           >
-            👍 <span style={{ fontSize: '10px' }}>{Math.max(0, agree)}</span>
+            👍 <span style={{ fontSize: '10px' }}>{formatCompactNumber(agree)}</span>
           </button>
           
           <button 
@@ -228,7 +229,7 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
               transition: 'all 150ms ease'
             }}
           >
-            😄 <span style={{ fontSize: '10px' }}>{Math.max(0, funny)}</span>
+            😄 <span style={{ fontSize: '10px' }}>{formatCompactNumber(funny)}</span>
           </button>
 
           <button 

@@ -4,6 +4,7 @@ import PollCard from './PollCard';
 import StreakBadge from './StreakBadge';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import { formatCompactNumber } from '../utils/formatters';
 
 export default function PostCard({ post, onDelete }) {
   const { user, userProfile, isAdmin } = useAuth();
@@ -214,7 +215,7 @@ export default function PostCard({ post, onDelete }) {
         </div>
       )}
 
-      {/* Action Bar */}
+      {/* Action Bar (Compact number formatting k and mn) */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <button 
@@ -234,7 +235,7 @@ export default function PostCard({ post, onDelete }) {
               transition: 'all 150ms ease'
             }}
           >
-            <span>👍</span> <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)' }}>{Math.max(0, agreeCount)}</span>
+            <span>👍</span> <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)' }}>{formatCompactNumber(agreeCount)}</span>
           </button>
 
           <button 
@@ -254,7 +255,7 @@ export default function PostCard({ post, onDelete }) {
               transition: 'all 150ms ease'
             }}
           >
-            <span>😄</span> <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)' }}>{Math.max(0, funnyCount)}</span>
+            <span>😄</span> <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)' }}>{formatCompactNumber(funnyCount)}</span>
           </button>
         </div>
 
@@ -264,7 +265,7 @@ export default function PostCard({ post, onDelete }) {
           className="btn-ghost" 
           style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-secondary)' }}
         >
-          💬 {post.commentCount || 0} INSIGHTS
+          💬 {formatCompactNumber(post.commentCount || 0)} INSIGHTS
         </button>
       </div>
 

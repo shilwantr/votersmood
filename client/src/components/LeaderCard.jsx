@@ -3,6 +3,7 @@ import { CitizenInquiry } from './Icons';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from './Toast';
+import { formatCompactNumber } from '../utils/formatters';
 
 export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }) {
   const { user } = useAuth();
@@ -148,7 +149,7 @@ export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }
       {/* Single Compact Horizontal Action Bar (Reactions Left, Open Questions Right) */}
       <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'var(--font-mono)', fontSize: '11px', flexWrap: 'wrap', gap: '6px' }}>
         
-        {/* Minimal Transparent Reaction Buttons (Soft Tint ONLY if Reacted) */}
+        {/* Minimal Transparent Reaction Buttons (k for thousands, mn for millions) */}
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <button
             type="button"
@@ -168,7 +169,7 @@ export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }
               transition: 'all 150ms ease'
             }}
           >
-            <span>👍</span> <span>{agreeCount.toLocaleString()}</span>
+            <span>👍</span> <span>{formatCompactNumber(agreeCount)}</span>
           </button>
 
           <button
@@ -189,13 +190,13 @@ export default function LeaderCard({ leader, rank, onSelect, openRegisterModal }
               transition: 'all 150ms ease'
             }}
           >
-            <span>😄</span> <span>{funnyCount.toLocaleString()}</span>
+            <span>😄</span> <span>{formatCompactNumber(funnyCount)}</span>
           </button>
         </div>
 
-        {/* Open Questions Count Indicator on the Right side of the Same Row */}
+        {/* Open Questions Count Indicator on the Right side */}
         <span style={{ fontWeight: 600, fontSize: '10.5px', color: 'var(--accent-copper-text)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-          <CitizenInquiry size={12} /> {leader.openQuestionsCount || 0} Open Ques
+          <CitizenInquiry size={12} /> {formatCompactNumber(leader.openQuestionsCount || 0)} Open Ques
         </span>
       </div>
     </div>
