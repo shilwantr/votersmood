@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import PostCard from '../components/PostCard';
 import PostComposer from '../components/PostComposer';
+import ShareLeaderModal from '../components/ShareLeaderModal';
 
 const CATEGORIES = [
   'All',
@@ -20,6 +21,7 @@ export default function LeaderDetail({ leaderId, onBack }) {
   const [leader, setLeader] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isShareOpen, setIsShareOpen] = useState(false);
   
   // Filters & Sorting
   const [sortOption, setSortOption] = useState('supported'); // 'supported' | 'discussed' | 'recent' | 'unanswered' | 'oldest'
@@ -109,6 +111,15 @@ export default function LeaderDetail({ leaderId, onBack }) {
                   <span className="badge badge-featured">{leader.party}</span>
                   <span className="badge badge-verified">{leader.type}</span>
                   
+                  {/* Share Leader Profile Button */}
+                  <button
+                    onClick={() => setIsShareOpen(true)}
+                    className="btn-ghost"
+                    style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#0284C7', backgroundColor: '#F0F9FF', border: '1px solid #BAE6FD', padding: '3px 8px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}
+                  >
+                    <span>📤</span> Share Profile
+                  </button>
+
                   {/* Official Website Link Button */}
                   {leader.website && (
                     <button
@@ -216,6 +227,13 @@ export default function LeaderDetail({ leaderId, onBack }) {
           <PostCard key={q.id} post={{ ...q, isOpenQuestion: true, targetLeaderName: leader?.name }} onDelete={(id) => setQuestions(questions.filter(item => item.id !== id))} />
         ))
       )}
+
+      {/* Share Leader Modal */}
+      <ShareLeaderModal 
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        leader={leader}
+      />
     </div>
   );
 }
