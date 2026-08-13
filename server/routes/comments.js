@@ -64,6 +64,7 @@ router.post('/', verifyAuthToken, requireAuth, async (req, res) => {
     content: content.trim(),
     authorId: req.user.uid,
     authorName: req.user.name || req.user.displayName || req.user.email?.split('@')[0].toUpperCase() || 'VERIFIED CITIZEN',
+    authorAvatar: req.user.avatarUrl || req.user.photoURL || `https://api.dicebear.com/10.x/avataaars/svg?seed=${req.user.uid || 'voter'}`,
     isApproved: true,
     agreeCount: 0,
     funnyCount: 0,

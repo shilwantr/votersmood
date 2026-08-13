@@ -36,6 +36,7 @@ export const verifyAuthToken = async (req, res, next) => {
             uid: userData.uid,
             email: userData.email,
             name: userData.displayName || userData.email.split('@')[0].toUpperCase(),
+            avatarUrl: userData.avatarUrl || `https://api.dicebear.com/10.x/avataaars/svg?seed=${userData.uid || 'voter'}`,
             isAdmin: userData.isAdmin === true
           };
           return next();
@@ -46,6 +47,7 @@ export const verifyAuthToken = async (req, res, next) => {
           uid: 'uid_' + Buffer.from(email).toString('hex').substring(0, 16),
           email: email,
           name: email.split('@')[0].toUpperCase(),
+          avatarUrl: `https://api.dicebear.com/10.x/avataaars/svg?seed=${email}`,
           isAdmin: roleType === 'admin'
         };
         return next();
@@ -62,6 +64,7 @@ export const verifyAuthToken = async (req, res, next) => {
       uid: isDemoAdmin ? 'admin-user-id' : 'demo-voter-' + Date.now(),
       email: isDemoAdmin ? 'admin@votersmood.in' : 'demo@votersmood.in',
       name: isDemoAdmin ? 'Official Gazette Admin' : 'DEMO VOTER',
+      avatarUrl: `https://api.dicebear.com/10.x/avataaars/svg?seed=admin`,
       isAdmin: isDemoAdmin
     };
     return next();
@@ -77,6 +80,7 @@ export const verifyAuthToken = async (req, res, next) => {
         uid: 'user_fallback_' + Date.now(),
         email: 'voter@votersmood.in',
         name: 'VERIFIED CITIZEN',
+        avatarUrl: `https://api.dicebear.com/10.x/avataaars/svg?seed=fallback`,
         isAdmin: false
       };
     }
@@ -85,6 +89,7 @@ export const verifyAuthToken = async (req, res, next) => {
       uid: 'user_anon_' + Date.now(),
       email: 'anonymous@votersmood.in',
       name: 'VERIFIED CITIZEN',
+      avatarUrl: `https://api.dicebear.com/10.x/avataaars/svg?seed=anon`,
       isAdmin: false
     };
   }

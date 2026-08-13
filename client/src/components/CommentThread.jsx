@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 
-// Recursive Chat Bubble Component
+// Recursive Chat Bubble Component (Clean & Less Borders Layout)
 function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, user, isAdmin, level = 0 }) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyText, setReplyText] = useState('');
@@ -13,6 +13,9 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
 
   const isTopLevel = !comment.parentId;
   const childComments = allComments.filter(c => c.parentId === comment.id);
+
+  // Dynamic Avatar fallback
+  const avatarUrl = comment.authorAvatar || `https://api.dicebear.com/10.x/avataaars/svg?seed=${encodeURIComponent(comment.authorId || comment.authorName || 'voter')}`;
 
   const handleCommentReaction = async (type) => {
     if (!user) {
@@ -68,59 +71,65 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: level > 0 ? '6px' : '10px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: level > 0 ? '4px' : '8px' }}>
       
-      {/* Clean Chat Bubble */}
+      {/* Clean Minimal Comment Item (Less Borders) */}
       <div 
         style={{
-          maxWidth: isTopLevel ? '92%' : '88%',
-          alignSelf: 'flex-start',
-          backgroundColor: isTopLevel ? '#FFFFFF' : '#F6F3EE',
-          border: '1px solid #E2DFD8',
-          borderRadius: level === 0 ? '12px 12px 12px 2px' : '10px 10px 10px 2px',
+          width: '100%',
+          backgroundColor: isTopLevel ? '#F8F9FA' : '#FAFAFA',
+          border: '1px solid #F1F5F9',
+          borderRadius: '8px',
           padding: '10px 14px',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.02)',
-          position: 'relative',
+          transition: 'background-color 150ms ease',
         }}
       >
-        {/* Bubble Author & Meta */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px', gap: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'var(--bg-navbar)', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 700 }}>
-              {comment.authorName?.charAt(0) || 'C'}
+        {/* Comment Author Header & 2D Avatar */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <img 
+              src={avatarUrl} 
+              alt={comment.authorName} 
+              style={{ 
+                width: '26px', 
+                height: '26px', 
+                borderRadius: '50%', 
+                backgroundColor: '#FFFFFF', 
+                border: '1px solid #E2E8F0',
+                flexShrink: 0 
+              }} 
+            />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '11.5px', color: 'var(--text-primary)' }}>
+                {comment.authorName}
+              </span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-muted)' }}>
+                • {formatCommentDate(comment.createdAt)}
+              </span>
+              <span className="badge badge-verified" style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '4px' }}>
+                {isTopLevel ? 'INSIGHT' : 'MAX 50 CHARS'}
+              </span>
             </div>
-            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '11px', color: 'var(--text-primary)', textTransform: 'uppercase' }}>
-              {comment.authorName}
-            </span>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-muted)' }}>
-              • {formatCommentDate(comment.createdAt)}
-            </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span className="badge badge-verified" style={{ fontSize: '9px', padding: '1px 4px' }}>
-              {isTopLevel ? 'INSIGHT' : 'MAX 50 CHARS'}
-            </span>
-
-            {(isAdmin || user?.uid === comment.authorId) && (
-              <button 
-                onClick={() => onDeleteComment(comment.id)} 
-                className="btn-ghost" 
-                style={{ fontSize: '10px', color: 'var(--color-error)', fontWeight: 700, padding: 0 }}
-              >
-                🗑
-              </button>
-            )}
-          </div>
+          {(isAdmin || user?.uid === comment.authorId) && (
+            <button 
+              onClick={() => onDeleteComment(comment.id)} 
+              className="btn-ghost" 
+              style={{ fontSize: '11px', color: 'var(--color-error)', fontWeight: 600, padding: '2px 4px' }}
+            >
+              🗑
+            </button>
+          )}
         </div>
 
-        {/* Bubble Text */}
-        <div style={{ fontFamily: 'var(--font-sans)', fontSize: '13.5px', lineHeight: 1.4, color: 'var(--text-primary)', marginBottom: '6px', wordBreak: 'break-word' }}>
+        {/* Comment Message Text */}
+        <div style={{ fontFamily: 'var(--font-sans)', fontSize: '13.5px', lineHeight: 1.5, color: '#1E293B', marginBottom: '6px', wordBreak: 'break-word', paddingLeft: '34px' }}>
           {comment.content}
         </div>
 
-        {/* Bubble Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '4px' }}>
+        {/* Comment Actions (Subtle & Clean) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '34px' }}>
           <button 
             onClick={() => handleCommentReaction('agree')} 
             className="btn-ghost" 
@@ -129,8 +138,8 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
               fontFamily: 'var(--font-mono)',
               padding: '2px 6px',
               borderRadius: '4px',
-              backgroundColor: hasAgreed ? '#FFF7ED' : 'transparent',
-              color: hasAgreed ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              backgroundColor: hasAgreed ? '#EFF6FF' : 'transparent',
+              color: hasAgreed ? 'var(--bg-navy-authority)' : 'var(--text-secondary)',
               fontWeight: hasAgreed ? 700 : 500
             }}
           >
@@ -144,7 +153,7 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
               fontFamily: 'var(--font-mono)',
               padding: '2px 6px',
               borderRadius: '4px',
-              backgroundColor: hasFunny ? '#F1F5F9' : 'transparent',
+              backgroundColor: hasFunny ? '#F8FAFC' : 'transparent',
               color: hasFunny ? 'var(--bg-navy-authority)' : 'var(--text-secondary)',
               fontWeight: hasFunny ? 700 : 500
             }}
@@ -154,28 +163,28 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
           <button 
             onClick={() => setShowReplyForm(!showReplyForm)} 
             className="btn-ghost" 
-            style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', padding: '0', color: 'var(--accent-primary)', fontWeight: 700 }}
+            style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', padding: '0 4px', color: 'var(--bg-navy-authority)', fontWeight: 600 }}
           >
             ↪ REPLY
           </button>
         </div>
       </div>
 
-      {/* Sleek Reply Input Capsule */}
+      {/* Reply Input Capsule */}
       {showReplyForm && (
         <form 
           onSubmit={handleSendReply}
           style={{ 
-            maxWidth: '85%', 
-            marginLeft: '8px', 
+            marginLeft: '34px', 
+            marginTop: '4px',
             backgroundColor: '#FFFFFF', 
-            border: '1px solid var(--accent-primary)', 
-            borderRadius: '10px', 
+            border: '1px solid var(--border-subtle)', 
+            borderRadius: '8px', 
             padding: '6px 10px',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+            boxShadow: '0 1px 4px rgba(0,0,0,0.03)'
           }}
         >
           <input
@@ -201,9 +210,9 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
         </form>
       )}
 
-      {/* Recursive Nested Sub-Threads */}
+      {/* Recursive Nested Sub-Threads (Subtle Left Thread Line) */}
       {childComments.length > 0 && (
-        <div style={{ paddingLeft: '14px', borderLeft: '2px solid var(--accent-primary)', marginTop: '2px' }}>
+        <div style={{ paddingLeft: '18px', borderLeft: '2px solid #E2E8F0', marginLeft: '12px', marginTop: '2px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {childComments.map(child => (
             <CommentBubble
               key={child.id}
@@ -280,9 +289,9 @@ export default function CommentThread({ postId }) {
   const topLevelComments = comments.filter(c => !c.parentId);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
       
-      {/* Sleek Top Level Comment Input Box */}
+      {/* Sleek Top Level Comment Input Box (Clean Border) */}
       <form 
         onSubmit={handleTopSubmit} 
         style={{ 
@@ -290,8 +299,8 @@ export default function CommentThread({ postId }) {
           flexDirection: 'column', 
           gap: '6px', 
           backgroundColor: '#FFFFFF', 
-          border: '1px solid #E0DDD7', 
-          borderRadius: '10px', 
+          border: '1px solid var(--border-subtle)', 
+          borderRadius: '8px', 
           padding: '10px 12px' 
         }}
       >
@@ -304,7 +313,7 @@ export default function CommentThread({ postId }) {
           rows={2}
           style={{ width: '100%', border: 'none', background: 'transparent', padding: 0, fontSize: '13.5px', outline: 'none', resize: 'none', color: 'var(--text-primary)' }}
         />
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px', borderTop: '1px solid #F0EFEA' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '6px', borderTop: '1px solid #F1F5F9' }}>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-muted)' }}>
             {newTopComment.length}/500 MAX
           </span>
@@ -321,7 +330,7 @@ export default function CommentThread({ postId }) {
 
       {/* Recursive Chat Bubbles List */}
       {isLoading ? (
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)', padding: '8px 0' }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)', padding: '6px 0' }}>
           Loading insights from database...
         </div>
       ) : topLevelComments.length > 0 ? (
@@ -340,7 +349,7 @@ export default function CommentThread({ postId }) {
           ))}
         </div>
       ) : (
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)', padding: '8px 0', fontStyle: 'italic' }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)', padding: '6px 0', fontStyle: 'italic' }}>
           No comments posted yet. Be the first verified citizen to share an insight!
         </div>
       )}

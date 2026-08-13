@@ -72,8 +72,10 @@ export default function PostCard({ post, onDelete }) {
 
   if (isDeleted) return null;
 
+  const authorAvatarUrl = post.authorAvatar || `https://api.dicebear.com/10.x/avataaars/svg?seed=${encodeURIComponent(post.authorId || post.authorName || 'voter')}`;
+
   return (
-    <div style={{ backgroundColor: '#FFFFFF', border: post.isOpenQuestion ? '2px solid var(--accent-primary)' : '1px solid #E5E2DC', borderRadius: '8px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', marginBottom: '16px' }}>
+    <div style={{ backgroundColor: '#FFFFFF', border: post.isOpenQuestion ? '2px solid var(--accent-primary)' : '1px solid #E5E2DC', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', marginBottom: '16px' }}>
       
       {/* OPEN QUESTION SPECIAL BADGE STRIP */}
       {post.isOpenQuestion && (
@@ -103,9 +105,11 @@ export default function PostCard({ post, onDelete }) {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: '38px', height: '38px', borderRadius: '6px', backgroundColor: 'var(--bg-navbar)', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
-            {post.authorName?.charAt(0) || 'V'}
-          </div>
+          <img 
+            src={authorAvatarUrl} 
+            alt={post.authorName} 
+            style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-canvas)', flexShrink: 0 }} 
+          />
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '13px', color: 'var(--text-primary)', textTransform: 'uppercase' }}>
@@ -121,7 +125,7 @@ export default function PostCard({ post, onDelete }) {
 
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
           {!post.isOpenQuestion && post.leaderTag && (
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)', backgroundColor: 'var(--bg-secondary)', padding: '3px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)', backgroundColor: 'var(--bg-canvas)', padding: '3px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
               📍 {post.leaderTag}
             </span>
           )}
@@ -195,7 +199,7 @@ export default function PostCard({ post, onDelete }) {
           className="btn-ghost" 
           style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-secondary)' }}
         >
-          💬 {post.commentCount || 2} INSIGHTS
+          💬 {post.commentCount || 0} INSIGHTS
         </button>
       </div>
 
