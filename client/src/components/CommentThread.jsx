@@ -276,7 +276,7 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
               user={user}
               userProfile={userProfile}
               isAdmin={isAdmin}
-              level={0}
+              level={level + 1}
             />
           ))}
         </div>
@@ -354,6 +354,13 @@ export default function CommentThread({ postId }) {
     setNewTopComment('');
   };
 
+  // Dynamic auto-expanding height handler
+  const handleTextareaInput = (e) => {
+    setNewTopComment(e.target.value.slice(0, 500));
+    e.target.style.height = 'auto';
+    e.target.style.height = Math.max(48, e.target.scrollHeight) + 'px';
+  };
+
   const topLevelComments = comments.filter(c => !c.parentId);
 
   return (
@@ -379,29 +386,29 @@ export default function CommentThread({ postId }) {
         </button>
       </div>
 
-      {/* Top Level Comment Input Box (Clean Borderless Full-Width Typable Row Right to Submit Button!) */}
+      {/* Top Level Comment Input Box (Starts at 2 rows height & auto-expands height dynamically as text grows!) */}
       {showMainInput && (
         <form 
           onSubmit={handleTopSubmit} 
           style={{ 
             display: 'flex', 
-            alignItems: 'center', 
-            gap: '10px', 
+            alignItems: 'flex-end', 
+            gap: '12px', 
             backgroundColor: 'transparent', 
             border: 'none', 
             padding: '4px 0',
             width: '100%'
           }}
         >
-          <input
-            type="text"
+          <textarea
             className="borderless-input"
             value={newTopComment}
-            onChange={(e) => setNewTopComment(e.target.value.slice(0, 500))}
+            onChange={handleTextareaInput}
             placeholder={user ? "Write an insight comment (max 500 chars)..." : "Sign in to write a comment..."}
             maxLength={500}
             disabled={!user}
             autoFocus
+            rows={2}
             style={{ 
               flex: 1, 
               border: 'none !important', 
@@ -410,21 +417,27 @@ export default function CommentThread({ postId }) {
               background: 'transparent', 
               backgroundColor: 'transparent',
               fontSize: '15px', 
-              padding: '6px 0', 
-              color: 'var(--text-primary)' 
+              lineHeight: 1.5,
+              padding: '4px 0', 
+              minHeight: '48px',
+              color: 'var(--text-primary)',
+              resize: 'none',
+              overflow: 'hidden'
             }}
           />
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--text-muted)', flexShrink: 0 }}>
-            {newTopComment.length}/500
-          </span>
-          <button 
-            type="submit" 
-            className="btn-primary" 
-            disabled={!user || !newTopComment.trim()}
-            style={{ fontSize: '11px', padding: '4px 14px', borderRadius: '16px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-          >
-            <span>💬</span> SUBMIT
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, paddingBottom: '4px' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--text-muted)' }}>
+              {newTopComment.length}/500
+            </span>
+            <button 
+              type="submit" 
+              className="btn-primary" 
+              disabled={!user || !newTopComment.trim()}
+              style={{ fontSize: '11px', padding: '6px 14px', borderRadius: '16px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+            >
+              <span>💬</span> SUBMIT
+            </button>
+          </div>
         </form>
       )}
 
