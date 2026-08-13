@@ -104,6 +104,12 @@ input.borderless-input, textarea.borderless-input {
   box-shadow: none !important;
   background-color: transparent !important;
   background: transparent !important;
+  resize: none !important;
+  overflow: hidden !important;
+}
+
+textarea::-webkit-scrollbar {
+  display: none !important;
 }
 
 /* Responsive Breakpoint Matrix */

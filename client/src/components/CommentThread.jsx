@@ -215,7 +215,7 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
           </button>
         </div>
 
-        {/* Seamless Borderless Reply Input (Whole card typable, NO extra borders!) */}
+        {/* Seamless Borderless Reply Input (Fully typable row right to send button) */}
         {showReplyForm && (
           <form 
             onSubmit={handleSendReply}
@@ -276,7 +276,7 @@ function CommentBubble({ comment, allComments, onReplySubmit, onDeleteComment, u
               user={user}
               userProfile={userProfile}
               isAdmin={isAdmin}
-              level={level + 1}
+              level={0}
             />
           ))}
         </div>
@@ -379,22 +379,22 @@ export default function CommentThread({ postId }) {
         </button>
       </div>
 
-      {/* Top Level Comment Input Box (Appears ONLY when pen write option is clicked!) */}
+      {/* Top Level Comment Input Box (Clean Borderless Full-Width Typable Row Right to Submit Button!) */}
       {showMainInput && (
         <form 
           onSubmit={handleTopSubmit} 
           style={{ 
             display: 'flex', 
-            flexDirection: 'column', 
-            gap: '6px', 
-            backgroundColor: '#FFFFFF', 
-            border: '1px solid var(--border-subtle)', 
-            borderRadius: '8px', 
-            padding: '10px 12px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+            alignItems: 'center', 
+            gap: '10px', 
+            backgroundColor: 'transparent', 
+            border: 'none', 
+            padding: '4px 0',
+            width: '100%'
           }}
         >
-          <textarea
+          <input
+            type="text"
             className="borderless-input"
             value={newTopComment}
             onChange={(e) => setNewTopComment(e.target.value.slice(0, 500))}
@@ -402,22 +402,29 @@ export default function CommentThread({ postId }) {
             maxLength={500}
             disabled={!user}
             autoFocus
-            rows={2}
-            style={{ width: '100%', border: 'none', background: 'transparent', padding: 0, fontSize: '15px', outline: 'none', resize: 'none', color: 'var(--text-primary)' }}
+            style={{ 
+              flex: 1, 
+              border: 'none !important', 
+              outline: 'none !important', 
+              boxShadow: 'none !important',
+              background: 'transparent', 
+              backgroundColor: 'transparent',
+              fontSize: '15px', 
+              padding: '6px 0', 
+              color: 'var(--text-primary)' 
+            }}
           />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '6px', borderTop: '1px solid #F1F5F9' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--text-muted)' }}>
-              {newTopComment.length}/500 MAX
-            </span>
-            <button 
-              type="submit" 
-              className="btn-primary" 
-              disabled={!user || !newTopComment.trim()}
-              style={{ fontSize: '11px', padding: '4px 12px', borderRadius: '4px' }}
-            >
-              💬 SUBMIT
-            </button>
-          </div>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--text-muted)', flexShrink: 0 }}>
+            {newTopComment.length}/500
+          </span>
+          <button 
+            type="submit" 
+            className="btn-primary" 
+            disabled={!user || !newTopComment.trim()}
+            style={{ fontSize: '11px', padding: '4px 14px', borderRadius: '16px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+          >
+            <span>💬</span> SUBMIT
+          </button>
         </form>
       )}
 
