@@ -17,16 +17,18 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
       <div style={{ backgroundColor: '#09090B', color: '#FFFFFF', fontFamily: 'var(--font-mono)', fontSize: '11.5px', padding: '6px 0', borderBottom: '1px solid #27272A' }}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <span style={{ backgroundColor: '#18181B', color: 'var(--accent-gold-subtle)', border: '1px solid #27272A', padding: '2px 8px', borderRadius: '4px', fontWeight: 700, fontSize: '11px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+            <span style={{ backgroundColor: '#18181B', color: 'var(--accent-gold-subtle)', border: '1px solid #27272A', padding: '2px 8px', borderRadius: '4px', fontWeight: 700, fontSize: '11px', display: 'inline-flex', alignItems: 'center', gap: '5px', whiteSpace: 'nowrap' }}>
               <OfficialSeal size={13} /> OFFICIAL GAZETTE
             </span>
-            <span style={{ color: '#A1A1AA', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>POLITICAL INTELLIGENCE & VERIFIED CONSTITUENCY ENGINE</span>
+            <span className="gazette-top-tagline" style={{ color: '#A1A1AA', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              POLITICAL INTELLIGENCE & VERIFIED CONSTITUENCY ENGINE
+            </span>
           </div>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <span style={{ color: '#A1A1AA' }}>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <span style={{ color: '#A1A1AA', fontSize: '11px', whiteSpace: 'nowrap' }}>
               STATUS: <span style={{ color: user ? '#059669' : '#FBBF24', fontWeight: 600 }}>{user ? '🟢 REGISTERED' : '🔑 GUEST'}</span>
             </span>
-            <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '4px', backgroundColor: isAdmin ? 'var(--bg-navy-authority)' : '#18181B', border: '1px solid #27272A', color: '#FFFFFF' }}>
+            <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '4px', backgroundColor: isAdmin ? 'var(--bg-navy-authority)' : '#18181B', border: '1px solid #27272A', color: '#FFFFFF', whiteSpace: 'nowrap' }}>
               ADMIN: {isAdmin ? 'ON' : 'OFF'}
             </span>
           </div>
@@ -35,14 +37,14 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
 
       {/* 2. Main Navigation Bar (#FFFFFF, 1px solid #E4E4E7) */}
       <nav style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid var(--border-subtle)' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '64px' }}>
+        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '60px' }}>
           
           {/* Brand Logo with Cormorant Garamond Font */}
-          <div onClick={() => handleNavClick('discussions')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontFamily: 'var(--font-brand)', fontSize: '28px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+          <div onClick={() => handleNavClick('discussions')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="brand-logo-text" style={{ fontFamily: 'var(--font-brand)', fontSize: '26px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>
               THE STATE UNION
             </span>
-            <span style={{ fontFamily: 'var(--font-serif)', fontSize: '11px', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)', padding: '2px 6px', backgroundColor: 'var(--bg-canvas)', borderRadius: '4px' }}>
+            <span style={{ fontFamily: 'var(--font-serif)', fontSize: '10px', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)', padding: '1px 5px', backgroundColor: 'var(--bg-canvas)', borderRadius: '4px', whiteSpace: 'nowrap' }}>
               जनमत
             </span>
           </div>
@@ -113,7 +115,8 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="mobile-hamburger"
-            style={{ display: 'none', background: 'none', border: 'none', fontSize: '22px', cursor: 'pointer', padding: '4px', color: 'var(--text-primary)' }}
+            aria-label="Toggle navigation menu"
+            style={{ display: 'none', background: 'none', border: 'none', fontSize: '22px', cursor: 'pointer', padding: '4px 8px', color: 'var(--text-primary)' }}
           >
             {mobileMenuOpen ? '✕' : '☰'}
           </button>
@@ -140,11 +143,12 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
                     fontSize: '14px',
                     fontWeight: isActive ? 700 : 500,
                     color: isActive ? 'var(--bg-navy-authority)' : 'var(--text-primary)',
-                    padding: '8px 12px',
+                    padding: '10px 12px',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
-                    backgroundColor: isActive ? 'var(--bg-canvas)' : 'transparent'
+                    backgroundColor: isActive ? 'var(--bg-canvas)' : 'transparent',
+                    borderRadius: '6px'
                   }}
                 >
                   <IconComp size={16} />
