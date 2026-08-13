@@ -152,11 +152,12 @@ export default function PostCard({ post, onDelete }) {
           />
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '13px', color: 'var(--text-primary)', textTransform: 'uppercase' }}>
+              {/* Post author name 11px */}
+              <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '11px', color: 'var(--text-primary)', textTransform: 'uppercase' }}>
                 {post.authorName || 'VERIFIED CITIZEN'}
               </span>
 
-              {/* 7-Day Active Streak Tick Icon (Only shows tick ✓ when 7-day streak is active) */}
+              {/* 7-Day Active Streak Tick Icon */}
               {showVerifiedTick && (
                 <span 
                   title="7-Day Active Streak Citizen ✓" 
@@ -164,12 +165,12 @@ export default function PostCard({ post, onDelete }) {
                     color: '#0284C7', 
                     backgroundColor: '#E0F2FE', 
                     borderRadius: '50%', 
-                    width: '18px', 
-                    height: '18px', 
+                    width: '16px', 
+                    height: '16px', 
                     display: 'inline-flex', 
                     alignItems: 'center', 
-                    justifyContent: 'center', 
-                    fontSize: '11px', 
+                    justify: 'center', 
+                    fontSize: '10px', 
                     fontWeight: 800, 
                     border: '1px solid #BAE6FD',
                     flexShrink: 0
@@ -179,7 +180,8 @@ export default function PostCard({ post, onDelete }) {
                 </span>
               )}
             </div>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+            {/* Post time 8px */}
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--text-muted)', marginTop: '2px' }}>
               {formatDate(post.createdAt)}
             </span>
           </div>
@@ -205,8 +207,8 @@ export default function PostCard({ post, onDelete }) {
         </div>
       </div>
 
-      {/* Content */}
-      <div style={{ fontFamily: 'var(--font-sans)', fontSize: '15px', lineHeight: 1.55, color: 'var(--text-primary)', marginBottom: '14px', wordBreak: 'break-word' }}>
+      {/* Content 14px */}
+      <div style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', lineHeight: 1.55, color: 'var(--text-primary)', marginBottom: '14px', wordBreak: 'break-word' }}>
         {post.content}
       </div>
 
@@ -217,7 +219,7 @@ export default function PostCard({ post, onDelete }) {
         </div>
       )}
 
-      {/* Action Bar */}
+      {/* Action Bar (Removed text AGREE & FUNNY, clean emoji + small px count) */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button 
@@ -225,11 +227,11 @@ export default function PostCard({ post, onDelete }) {
             className="btn-secondary" 
             style={{
               fontSize: '12px',
-              padding: '6px 14px',
+              padding: '4px 12px',
               borderRadius: '20px',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '4px',
               border: 'none',
               backgroundColor: hasAgreed ? '#FEF3C7' : '#F1F5F9',
               color: hasAgreed ? '#92400E' : '#334155',
@@ -238,7 +240,7 @@ export default function PostCard({ post, onDelete }) {
               transition: 'all 150ms ease'
             }}
           >
-            <span>👍</span> {hasAgreed ? 'AGREED ✓' : 'AGREE'} ({Math.max(0, agreeCount)})
+            <span>👍</span> <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)' }}>{Math.max(0, agreeCount)}</span>
           </button>
 
           <button 
@@ -246,11 +248,11 @@ export default function PostCard({ post, onDelete }) {
             className="btn-secondary" 
             style={{
               fontSize: '12px',
-              padding: '6px 14px',
+              padding: '4px 12px',
               borderRadius: '20px',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '4px',
               border: 'none',
               backgroundColor: hasFunny ? '#E2E8F0' : '#F1F5F9',
               color: hasFunny ? '#0F172A' : '#334155',
@@ -259,14 +261,14 @@ export default function PostCard({ post, onDelete }) {
               transition: 'all 150ms ease'
             }}
           >
-            <span>😄</span> {hasFunny ? 'FUNNY ✓' : 'FUNNY'} ({Math.max(0, funnyCount)})
+            <span>😄</span> <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)' }}>{Math.max(0, funnyCount)}</span>
           </button>
         </div>
 
         <button 
           onClick={() => setShowComments(!showComments)}
           className="btn-ghost" 
-          style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-secondary)' }}
+          style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-secondary)' }}
         >
           💬 {post.commentCount || 0} INSIGHTS
         </button>
