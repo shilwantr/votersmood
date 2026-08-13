@@ -13,28 +13,40 @@ export default function Home({ openRegisterModal }) {
 
   useEffect(() => {
     let isMounted = true;
-    setLoading(true);
 
-    Promise.all([
-      api.getPosts(),
-      api.getLeaders({ sort: 'openQuestions' })
-    ]).then(([postsData, leadersData]) => {
-      if (isMounted) {
-        const postsList = Array.isArray(postsData) ? postsData : (postsData?.posts || []);
-        setPosts(postsList);
-        
-        // Sort leaders strictly by openQuestionsCount descending & pick top 5
-        const list = Array.isArray(leadersData) ? leadersData : (leadersData?.leaders || []);
-        const sorted = [...list].sort((a, b) => (b.openQuestionsCount || 0) - (a.openQuestionsCount || 0));
-        setFeaturedLeaders(sorted.slice(0, 5));
-        
-        setLoading(false);
-      }
-    }).catch(() => {
-      if (isMounted) setLoading(false);
-    });
+    const loadData = (showLoading = false) => {
+      if (showLoading) setLoading(true);
+      Promise.all([
+        api.getPosts(),
+        api.getLeaders({ sort: 'openQuestions' })
+      ]).then(([postsData, leadersData]) => {
+        if (isMounted) {
+          const postsList = Array.isArray(postsData) ? postsData : (postsData?.posts || []);
+          setPosts(postsList);
+          
+          // Sort leaders strictly by openQuestionsCount descending & pick top 5
+          const list = Array.isArray(leadersData) ? leadersData : (leadersData?.leaders || []);
+          const sorted = [...list].sort((a, b) => (b.openQuestionsCount || 0) - (a.openQuestionsCount || 0));
+          setFeaturedLeaders(sorted.slice(0, 5));
+          
+          setLoading(false);
+        }
+      }).catch(() => {
+        if (isMounted) setLoading(false);
+      });
+    };
 
-    return () => { isMounted = false; };
+    loadData(true);
+
+    // Auto-refresh posts and leaders every 1 minute (60,000 ms) from Cloud Firestore DB
+    const intervalId = setInterval(() => {
+      loadData(false);
+    }, 60000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
   }, []);
 
   const handlePostCreated = (newPost) => {

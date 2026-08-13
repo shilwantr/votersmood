@@ -28,27 +28,39 @@ export default function LeaderDetail({ leaderId, onBack }) {
 
   useEffect(() => {
     let isMounted = true;
-    setLoading(true);
 
-    Promise.all([
-      api.getLeaderById(leaderId),
-      api.getPosts({ leaderId, isOpenQuestion: 'true', sort: sortOption, category: categoryFilter })
-    ]).then(([leaderData, postsData]) => {
-      if (isMounted) {
-        setLeader(leaderData);
-        
-        let filtered = postsData.filter(p => p.isOpenQuestion === true || p.targetLeaderId === leaderId);
-        if (statusFilter === 'Answered') filtered = filtered.filter(p => p.responseStatus === 'answered');
-        if (statusFilter === 'Unanswered') filtered = filtered.filter(p => p.responseStatus === 'pending');
-        
-        setQuestions(filtered);
-        setLoading(false);
-      }
-    }).catch(() => {
-      if (isMounted) setLoading(false);
-    });
+    const fetchLeaderData = (showLoading = false) => {
+      if (showLoading) setLoading(true);
+      Promise.all([
+        api.getLeaderById(leaderId),
+        api.getPosts({ leaderId, isOpenQuestion: 'true', sort: sortOption, category: categoryFilter })
+      ]).then(([leaderData, postsData]) => {
+        if (isMounted) {
+          setLeader(leaderData);
+          
+          let filtered = postsData.filter(p => p.isOpenQuestion === true || p.targetLeaderId === leaderId);
+          if (statusFilter === 'Answered') filtered = filtered.filter(p => p.responseStatus === 'answered');
+          if (statusFilter === 'Unanswered') filtered = filtered.filter(p => p.responseStatus === 'pending');
+          
+          setQuestions(filtered);
+          setLoading(false);
+        }
+      }).catch(() => {
+        if (isMounted) setLoading(false);
+      });
+    };
 
-    return () => { isMounted = false; };
+    fetchLeaderData(true);
+
+    // Auto-refresh open questions every 1 minute (60,000 ms) from Cloud Firestore DB
+    const intervalId = setInterval(() => {
+      fetchLeaderData(false);
+    }, 60000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
   }, [leaderId, sortOption, categoryFilter, statusFilter]);
 
   return (

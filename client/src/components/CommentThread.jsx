@@ -272,19 +272,30 @@ export default function CommentThread({ postId }) {
 
   useEffect(() => {
     let isMounted = true;
-    setIsLoading(true);
-    api.getComments(postId).then(data => {
-      if (isMounted) {
-        setComments(data || []);
-        setIsLoading(false);
-      }
-    }).catch(() => {
-      if (isMounted) {
-        setComments([]);
-        setIsLoading(false);
-      }
-    });
-    return () => { isMounted = false; };
+
+    const fetchLatestComments = (showLoading = false) => {
+      if (showLoading) setIsLoading(true);
+      api.getComments(postId).then(data => {
+        if (isMounted) {
+          setComments(data || []);
+          setIsLoading(false);
+        }
+      }).catch(() => {
+        if (isMounted) setIsLoading(false);
+      });
+    };
+
+    fetchLatestComments(true);
+
+    // Auto-refresh comments every 1 minute (60,000 ms) from Cloud Firestore DB
+    const intervalId = setInterval(() => {
+      fetchLatestComments(false);
+    }, 60000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
   }, [postId]);
 
   const handleAddComment = async (parentId, text) => {
