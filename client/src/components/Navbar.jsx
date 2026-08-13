@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { OfficialSeal, EditorialFeed, BallotBox, AssemblyPillar, SignalPulse } from './Icons';
 import AvatarSelectionModal from './AvatarSelectionModal';
@@ -7,11 +7,25 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
   const { user, userProfile, isAdmin, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+
+  const dropdownRef = useRef(null);
 
   const handleNavClick = (tabId) => {
     setActiveTab(tabId);
     setMobileMenuOpen(false);
   };
+
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const userAvatar = userProfile?.avatarUrl || user?.avatarUrl || `https://api.dicebear.com/10.x/avataaars/svg?seed=${user?.uid || 'voter'}`;
   const isVerifiedStreak = userProfile?.isVerifiedStreak || user?.isVerifiedStreak;
@@ -103,19 +117,29 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
               )}
 
               {user ? (
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                  {/* Custom 2D Avatar Profile Trigger */}
+                <div ref={dropdownRef} style={{ position: 'relative' }}>
+                  {/* Clean Profile Badge Trigger */}
                   <div 
-                    onClick={() => setAvatarModalOpen(true)}
-                    title="Click to customize 2D Avatar"
-                    style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', backgroundColor: 'var(--bg-canvas)', border: '1px solid var(--border-subtle)', borderRadius: '20px', padding: '3px 10px 3px 3px' }}
+                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    title="Open Citizen Profile Menu"
+                    style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '8px', 
+                      cursor: 'pointer', 
+                      backgroundColor: profileDropdownOpen ? '#F1F5F9' : 'var(--bg-canvas)', 
+                      border: '1px solid var(--border-subtle)', 
+                      borderRadius: '20px', 
+                      padding: '3px 12px 3px 3px',
+                      transition: 'background-color 150ms ease'
+                    }}
                   >
                     <img 
                       src={userAvatar} 
                       alt="Profile Avatar" 
-                      style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid var(--border-subtle)', backgroundColor: '#FFFFFF' }} 
+                      style={{ width: '30px', height: '30px', borderRadius: '50%', border: '1px solid var(--border-subtle)', backgroundColor: '#FFFFFF' }} 
                     />
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12.5px', fontWeight: 700, color: 'var(--text-primary)' }}>
                       {userProfile?.displayName || user.email?.split('@')[0]}
                     </span>
 
@@ -140,11 +164,69 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
                         ✓
                       </span>
                     )}
+
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)', marginLeft: '2px' }}>
+                      {profileDropdownOpen ? '▲' : '▼'}
+                    </span>
                   </div>
 
-                  <button onClick={logout} className="btn-secondary" style={{ height: '36px', padding: '0 12px', fontSize: '12px' }}>
-                    Sign Out
-                  </button>
+                  {/* Profile Dropdown Popup Menu */}
+                  {profileDropdownOpen && (
+                    <div 
+                      style={{ 
+                        position: 'absolute', 
+                        top: 'calc(100% + 8px)', 
+                        right: 0, 
+                        width: '260px', 
+                        backgroundColor: '#FFFFFF', 
+                        border: '1px solid #E2E8F0', 
+                        borderRadius: '12px', 
+                        boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)', 
+                        padding: '12px', 
+                        zIndex: 200 
+                      }}
+                    >
+                      {/* User Info Header */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingBottom: '10px', borderBottom: '1px solid #F1F5F9', marginBottom: '8px' }}>
+                        <img src={userAvatar} alt="User Avatar" style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid #E2E8F0', backgroundColor: '#F8F9FA' }} />
+                        <div style={{ overflow: 'hidden' }}>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {userProfile?.displayName || user.email?.split('@')[0]}
+                          </div>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {user.email}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Citizen Details Strip */}
+                      <div style={{ backgroundColor: '#F8FAFC', borderRadius: '6px', padding: '8px 10px', marginBottom: '8px', fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#475569', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <div>📍 {userProfile?.constituency || 'Mumbai South'}, {userProfile?.state || 'MH'}</div>
+                        <div style={{ color: isVerifiedStreak ? '#0284C7' : '#D97706', fontWeight: 700 }}>
+                          🔥 Streak: {streakCount} Days {isVerifiedStreak ? '✓ Verified Citizen' : '(Active)'}
+                        </div>
+                      </div>
+
+                      {/* Menu Actions */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <button 
+                          onClick={() => { setAvatarModalOpen(true); setProfileDropdownOpen(false); }}
+                          className="btn-ghost"
+                          style={{ width: '100%', textAlign: 'left', fontSize: '12.5px', padding: '8px 10px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px', color: '#1E293B', fontWeight: 600 }}
+                        >
+                          <span>🎨</span> Change 2D Avatar
+                        </button>
+
+                        <button 
+                          onClick={() => { logout(); setProfileDropdownOpen(false); }}
+                          className="btn-ghost"
+                          style={{ width: '100%', textAlign: 'left', fontSize: '12.5px', padding: '8px 10px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px', color: '#DC2626', fontWeight: 700 }}
+                        >
+                          <span>🚪</span> Sign Out
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <button onClick={openRegisterModal} className="btn-primary" style={{ height: '36px', padding: '0 16px', fontSize: '13px' }}>
@@ -227,8 +309,8 @@ export default function Navbar({ activeTab, setActiveTab, openRegisterModal }) {
                 )}
 
                 {user ? (
-                  <button onClick={logout} className="btn-secondary" style={{ width: '100%', height: '38px', fontSize: '13px' }}>
-                    Sign Out ({user.email?.split('@')[0]})
+                  <button onClick={logout} className="btn-secondary" style={{ width: '100%', height: '38px', fontSize: '13px', color: '#DC2626', fontWeight: 700 }}>
+                    🚪 Sign Out ({user.email?.split('@')[0]})
                   </button>
                 ) : (
                   <button onClick={() => { openRegisterModal(); setMobileMenuOpen(false); }} className="btn-primary" style={{ width: '100%', height: '38px', fontSize: '13px' }}>
