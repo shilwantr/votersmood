@@ -2,51 +2,45 @@ import express from 'express';
 import { db } from '../config/firebase.js';
 import { collection, doc, setDoc, addDoc, getDocs, getDoc, deleteDoc, updateDoc, query, where, orderBy } from 'firebase/firestore';
 import { verifyAuthToken, requireAuth, requireAdmin } from '../middleware/auth.js';
-import { OFFICIAL_ELECTIONS, COMMUNITY_MINI_POLLS } from '../data/elections.js';
 
 const router = express.Router();
 
-let officialElectionsCache = [...OFFICIAL_ELECTIONS];
-let communityPollsCache = [...COMMUNITY_MINI_POLLS];
+let officialElectionsCache = [];
+let communityPollsCache = [];
 const userVotesMap = new Map();
 
-// Helper: Ensure default official elections exist in Cloud Firestore DB
-const seedOfficialElections = async () => {
-  if (!db) return;
-  try {
-    for (const poll of OFFICIAL_ELECTIONS) {
-      const pollRef = doc(db, 'official_elections', poll.id);
-      const snap = await getDoc(pollRef);
-      if (!snap.exists()) {
-        await setDoc(pollRef, poll);
-        console.log(`🔥 Firestore DB: Seeded official election poll [ID: ${poll.id}]`);
+// Async sync official election polls from Cloud Firestore DB
+const syncOfficialElectionsFromDB = async () => {
+  if (db) {
+    try {
+      const snap = await getDocs(query(collection(db, 'official_elections'), orderBy('createdAt', 'desc')));
+      if (snap.docs.length > 0) {
+        officialElectionsCache = snap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        console.log(`🔥 Firestore DB: Synchronized ${officialElectionsCache.length} official election polls from database`);
       }
+    } catch (e) {
+      console.warn('⚠️ Firestore official polls sync warning:', e.message);
     }
-  } catch (e) {
-    console.warn('⚠️ Firestore seed official elections warning:', e.message);
   }
 };
 
-// Helper: Ensure default community polls exist in Cloud Firestore DB
-const seedCommunityPolls = async () => {
-  if (!db) return;
-  try {
-    for (const poll of COMMUNITY_MINI_POLLS) {
-      const pollRef = doc(db, 'community_polls', poll.id);
-      const snap = await getDoc(pollRef);
-      if (!snap.exists()) {
-        await setDoc(pollRef, poll);
-        console.log(`🔥 Firestore DB: Seeded community mini poll [ID: ${poll.id}]`);
+// Async sync community polls from Cloud Firestore DB
+const syncCommunityPollsFromDB = async () => {
+  if (db) {
+    try {
+      const snap = await getDocs(query(collection(db, 'community_polls'), orderBy('createdAt', 'desc')));
+      if (snap.docs.length > 0) {
+        communityPollsCache = snap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        console.log(`🔥 Firestore DB: Synchronized ${communityPollsCache.length} community polls from database`);
       }
+    } catch (e) {
+      console.warn('⚠️ Firestore community polls sync warning:', e.message);
     }
-  } catch (e) {
-    console.warn('⚠️ Firestore seed community polls warning:', e.message);
   }
 };
 
-// Seed database on module load
-seedOfficialElections();
-seedCommunityPolls();
+syncOfficialElectionsFromDB();
+syncCommunityPollsFromDB();
 
 // GET /api/polls/signals - Live Polling Signals, Recent Activity, Discussed Constituencies & Hashtags (Synced with Firestore DB)
 router.get('/signals', async (req, res) => {
@@ -56,7 +50,7 @@ router.get('/signals', async (req, res) => {
     let observerTotal = 0;
     let recentActivity = [];
     let constituencyCounts = {};
-    let hashtags = new Set(['#MAHARASHTRAELECTIONS2026', '#WATERANDINFRASTRUCTURE', '#CMFACE2026']);
+    let hashtags = new Set(['#ELECTIONS2026', '#CIVICFEEDBACK', '#PUBLICVOICE']);
 
     if (db) {
       try {
@@ -93,8 +87,10 @@ router.get('/signals', async (req, res) => {
           const p = docSnap.data();
           if (p.topicTag) hashtags.add(`#${p.topicTag.replace(/^#/, '')}`);
           
-          const constiName = p.targetLeaderName ? p.targetLeaderName.replace(/ *\([^)]*\) */g, "") : 'Nagpur South West (MH)';
-          constituencyCounts[constiName] = (constituencyCounts[constiName] || 0) + 1;
+          if (p.targetLeaderName) {
+            const constiName = p.targetLeaderName.replace(/ *\([^)]*\) */g, "");
+            constituencyCounts[constiName] = (constituencyCounts[constiName] || 0) + 1;
+          }
         });
 
       } catch (e) {
@@ -102,33 +98,16 @@ router.get('/signals', async (req, res) => {
       }
     }
 
-    const grandTotal = totalVotes > 0 ? totalVotes : 8260;
-    const resCount = residentTotal > 0 ? residentTotal : Math.round(grandTotal * 0.65);
-    const obsCount = observerTotal > 0 ? observerTotal : grandTotal - resCount;
-    const resPct = Math.round((resCount / grandTotal) * 100);
-    const obsPct = 100 - resPct;
+    const grandTotal = totalVotes;
+    const resCount = residentTotal;
+    const obsCount = observerTotal;
+    const resPct = grandTotal > 0 ? Math.round((resCount / grandTotal) * 100) : 50;
+    const obsPct = grandTotal > 0 ? 100 - resPct : 50;
 
     const topConstituencies = Object.entries(constituencyCounts)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 3);
-
-    if (topConstituencies.length === 0) {
-      topConstituencies.push(
-        { name: 'Nagpur South West (MH)', count: 142 },
-        { name: 'Rae Bareli (UP)', count: 98 },
-        { name: 'Gorakhpur Urban (UP)', count: 76 }
-      );
-    }
-
-    if (recentActivity.length === 0) {
-      recentActivity = [
-        '• Verified Resident from Nagpur South West voted 2 mins ago',
-        '• Observer from Delhi voted 5 mins ago',
-        '• Verified Resident from Mumbai South voted 9 mins ago',
-        '• Observer from Bengaluru voted 14 mins ago'
-      ];
-    }
 
     res.json({
       pollingStats: {
@@ -144,16 +123,10 @@ router.get('/signals', async (req, res) => {
     });
   } catch (err) {
     res.json({
-      pollingStats: { totalVotes: 8260, residentVoters: 5370, residentPct: 65, observerVoters: 2890, observerPct: 35 },
-      recentActivity: [
-        '• Verified Resident from Nagpur South West voted 2 mins ago',
-        '• Observer from Delhi voted 5 mins ago'
-      ],
-      discussedConstituencies: [
-        { name: 'Nagpur South West (MH)', count: 142 },
-        { name: 'Rae Bareli (UP)', count: 98 }
-      ],
-      trendingHashtags: ['#MAHARASHTRAELECTIONS2026', '#UNIONBUDGET2026']
+      pollingStats: { totalVotes: 0, residentVoters: 0, residentPct: 0, observerVoters: 0, observerPct: 0 },
+      recentActivity: [],
+      discussedConstituencies: [],
+      trendingHashtags: ['#ELECTIONS2026', '#CIVICFEEDBACK']
     });
   }
 });
@@ -195,24 +168,11 @@ router.get('/user-votes', verifyAuthToken, requireAuth, async (req, res) => {
 router.get('/official', async (req, res) => {
   const { category } = req.query;
   try {
-    let result = [];
     if (db) {
-      try {
-        const snap = await getDocs(query(collection(db, 'official_elections'), orderBy('createdAt', 'desc')));
-        if (snap.docs.length > 0) {
-          result = snap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-          officialElectionsCache = result;
-          console.log(`🔥 Firestore DB: Retrieved ${result.length} official election polls from database`);
-        }
-      } catch (dbErr) {
-        console.warn('⚠️ Firestore read official polls warning:', dbErr.message);
-      }
+      await syncOfficialElectionsFromDB();
     }
 
-    if (result.length === 0) {
-      result = officialElectionsCache;
-    }
-
+    let result = [...officialElectionsCache];
     if (category && category.toLowerCase() !== 'all') {
       result = result.filter(e => e.category === category.toLowerCase());
     }
@@ -247,12 +207,8 @@ router.post('/official/vote', verifyAuthToken, requireAuth, async (req, res) => 
   let { electionId, candidateId, isResident, state, constituency } = req.body;
   const userId = req.user.uid;
 
-  if (!electionId) {
-    electionId = officialElectionsCache[0]?.id || 'election-mh-2026';
-  }
-
-  if (!candidateId) {
-    return res.status(400).json({ error: 'Please select a candidate before submitting your vote.' });
+  if (!electionId || !candidateId) {
+    return res.status(400).json({ error: 'Election ID and Candidate ID are required to vote.' });
   }
 
   const voteKey = `${userId}_${electionId}`;
@@ -270,14 +226,16 @@ router.post('/official/vote', verifyAuthToken, requireAuth, async (req, res) => 
     return res.status(400).json({ error: 'You have already voted in this official election poll.' });
   }
 
-  let electionData = officialElectionsCache.find(e => e.id === electionId) || OFFICIAL_ELECTIONS[0];
-
   if (db) {
     try {
       const electionRef = doc(db, 'official_elections', electionId);
       const snap = await getDoc(electionRef);
       
-      let data = snap.exists() ? snap.data() : { ...electionData };
+      if (!snap.exists()) {
+        return res.status(404).json({ error: 'Election poll not found in DB.' });
+      }
+
+      let data = snap.data();
       const residentVotes = data.residentVotes || {};
       const observerVotes = data.observerVotes || {};
 
@@ -317,28 +275,11 @@ router.post('/official/vote', verifyAuthToken, requireAuth, async (req, res) => 
       });
     } catch (dbErr) {
       console.warn('⚠️ Firestore vote update warning:', dbErr.message);
+      return res.status(500).json({ error: dbErr.message });
     }
   }
 
-  // Fallback in-memory vote tracking
-  if (isResident) {
-    if (!electionData.residentVotes[candidateId]) electionData.residentVotes[candidateId] = 0;
-    electionData.residentVotes[candidateId] += 1;
-  } else {
-    if (!electionData.observerVotes[candidateId]) electionData.observerVotes[candidateId] = 0;
-    electionData.observerVotes[candidateId] += 1;
-  }
-
-  electionData.totalVotes = (electionData.totalVotes || 0) + 1;
-  userVotesMap.set(voteKey, candidateId);
-
-  return res.json({
-    success: true,
-    message: 'Official Vote Confirmed & Segregated Successfully',
-    votedCandidateId: candidateId,
-    isResident,
-    election: electionData
-  });
+  return res.status(400).json({ error: 'Database unavailable for voting' });
 });
 
 // POST /api/polls/official - Admin Dynamic Election Creator (Persisted to Firestore DB)
@@ -429,25 +370,10 @@ router.delete('/official/:id', verifyAuthToken, requireAdmin, async (req, res) =
 // GET /api/polls/community
 router.get('/community', async (req, res) => {
   try {
-    let polls = [];
     if (db) {
-      try {
-        const snap = await getDocs(query(collection(db, 'community_polls'), orderBy('createdAt', 'desc')));
-        if (snap.docs.length > 0) {
-          polls = snap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-          communityPollsCache = polls;
-          console.log(`🔥 Firestore DB: Retrieved ${polls.length} community polls from database`);
-        }
-      } catch (dbErr) {
-        console.warn('⚠️ Firestore read community polls warning:', dbErr.message);
-      }
+      await syncCommunityPollsFromDB();
     }
-
-    if (polls.length === 0) {
-      polls = communityPollsCache;
-    }
-
-    res.json(polls);
+    res.json(communityPollsCache);
   } catch (error) {
     res.json(communityPollsCache);
   }

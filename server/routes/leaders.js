@@ -5,171 +5,8 @@ import { verifyAuthToken, requireAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
 
-export let LEADERS_CACHE = [
-  {
-    id: 'rahul-gandhi',
-    name: 'Rahul Gandhi',
-    party: 'INC',
-    state: 'UP',
-    constituency: 'Rae Bareli',
-    type: 'MP_LS',
-    chamber: 'Lok Sabha',
-    portfolio: 'Leader of Opposition, Lok Sabha',
-    portfolios: ['External Affairs', 'Defense'],
-    governmentPositions: ['Leader of Opposition'],
-    website: 'https://rahulgandhi.in',
-    profilePhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
-    status: 'Active',
-    gender: 'Male',
-    seatType: 'General',
-    agreeCount: 18900,
-    funnyCount: 1420,
-    openQuestionsCount: 38,
-    answeredCount: 10,
-    pendingCount: 28,
-    totalReactionsCount: 6210,
-    totalCommentsCount: 1890
-  },
-  {
-    id: 'mamata-banerjee',
-    name: 'Mamata Banerjee',
-    party: 'TMC',
-    state: 'WB',
-    constituency: 'Bhabanipur',
-    type: 'MLA',
-    chamber: 'Vidhan Sabha',
-    portfolio: 'Chief Minister, West Bengal',
-    portfolios: ['Home Affairs', 'Health', 'Land & Land Reforms'],
-    governmentPositions: ['Chief Minister'],
-    website: 'https://aitcofficial.org',
-    profilePhoto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80',
-    status: 'Active',
-    gender: 'Female',
-    seatType: 'General',
-    agreeCount: 15400,
-    funnyCount: 1120,
-    openQuestionsCount: 29,
-    answeredCount: 7,
-    pendingCount: 22,
-    totalReactionsCount: 4890,
-    totalCommentsCount: 1150
-  },
-  {
-    id: 'devendra-fadnavis',
-    name: 'Devendra Fadnavis',
-    party: 'BJP',
-    state: 'MH',
-    constituency: 'Nagpur South West',
-    type: 'MLA',
-    chamber: 'Vidhan Sabha',
-    portfolio: 'Deputy Chief Minister, Home & Energy Affairs',
-    portfolios: ['Home Affairs', 'Energy', 'Housing'],
-    governmentPositions: ['Deputy Chief Minister'],
-    website: 'https://devendrafadnavis.in',
-    profilePhoto: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=150&q=80',
-    status: 'Active',
-    gender: 'Male',
-    seatType: 'General',
-    agreeCount: 12400,
-    funnyCount: 840,
-    openQuestionsCount: 25,
-    answeredCount: 6,
-    pendingCount: 19,
-    totalReactionsCount: 4382,
-    totalCommentsCount: 1245
-  },
-  {
-    id: 'akhilesh-yadav',
-    name: 'Akhilesh Yadav',
-    party: 'SP',
-    state: 'UP',
-    constituency: 'Kannauj',
-    type: 'MP_LS',
-    chamber: 'Lok Sabha',
-    portfolio: 'National President, Samajwadi Party',
-    portfolios: ['Rural Development', 'Agriculture'],
-    governmentPositions: ['Party President'],
-    website: 'https://samajwadiparty.in',
-    profilePhoto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80',
-    status: 'Active',
-    gender: 'Male',
-    seatType: 'General',
-    agreeCount: 11200,
-    funnyCount: 910,
-    openQuestionsCount: 21,
-    answeredCount: 4,
-    pendingCount: 17,
-    totalReactionsCount: 3890,
-    totalCommentsCount: 810
-  },
-  {
-    id: 'nitin-gadkari',
-    name: 'Nitin Gadkari',
-    party: 'BJP',
-    state: 'MH',
-    constituency: 'Nagpur',
-    type: 'MP_LS',
-    chamber: 'Lok Sabha',
-    portfolio: 'Union Minister of Road Transport & Highways',
-    portfolios: ['Road Transport', 'Highways', 'MSME'],
-    governmentPositions: ['Cabinet Minister'],
-    website: 'https://nitingadkari.org.in',
-    profilePhoto: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80',
-    status: 'Active',
-    gender: 'Male',
-    seatType: 'General',
-    agreeCount: 24100,
-    funnyCount: 320,
-    openQuestionsCount: 19,
-    answeredCount: 8,
-    pendingCount: 11,
-    totalReactionsCount: 5120,
-    totalCommentsCount: 980
-  },
-  {
-    id: 'shashi-tharoor',
-    name: 'Shashi Tharoor',
-    party: 'INC',
-    state: 'KL',
-    constituency: 'Thiruvananthapuram',
-    type: 'MP_LS',
-    chamber: 'Lok Sabha',
-    portfolio: 'Chairman, Parliamentary Standing Committee',
-    portfolios: ['External Affairs', 'IT', 'Education'],
-    governmentPositions: ['Committee Chairman'],
-    website: 'https://shashitharoor.in',
-    profilePhoto: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80',
-    status: 'Active',
-    gender: 'Male',
-    seatType: 'General',
-    agreeCount: 9800,
-    funnyCount: 450,
-    openQuestionsCount: 15,
-    answeredCount: 5,
-    pendingCount: 10,
-    totalReactionsCount: 3100,
-    totalCommentsCount: 640
-  }
-];
-
-// Seed default leader profiles to Cloud Firestore DB
-const seedDefaultLeaders = async () => {
-  if (!db) return;
-  try {
-    for (const leader of LEADERS_CACHE) {
-      const leaderRef = doc(db, 'leaders', leader.id);
-      const snap = await getDoc(leaderRef);
-      if (!snap.exists()) {
-        await setDoc(leaderRef, leader);
-        console.log(`🔥 Firestore DB: Seeded default leader profile [ID: ${leader.id}]`);
-      }
-    }
-  } catch (e) {
-    console.warn('⚠️ Firestore seed leaders warning:', e.message);
-  }
-};
-
-seedDefaultLeaders();
+// 100% DATABASE-DRIVEN: Empty initial cache, synced exclusively from Cloud Firestore DB
+export let LEADERS_CACHE = [];
 
 // Helper to atomically update open questions count on leader documents
 export const incrementLeaderQuestionCounts = async (leaderId, delta = 1) => {
@@ -221,6 +58,9 @@ const syncLeadersFromDB = async () => {
     }
   }
 };
+
+// Initial sync from DB on server startup
+syncLeadersFromDB();
 
 // GET /api/leaders (Live Database Query, Ranking & Dynamic Filtering)
 router.get('/', async (req, res) => {
@@ -280,7 +120,7 @@ router.get('/', async (req, res) => {
   res.json(filtered);
 });
 
-// GET /api/leaders/:id (Instant SEO Slug / ID Server Lookup)
+// GET /api/leaders/:id (Instant SEO Slug / ID Server Lookup from DB)
 router.get('/:id', async (req, res) => {
   const param = req.params.id;
   const cleanSlug = param.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
@@ -299,7 +139,7 @@ router.get('/:id', async (req, res) => {
     } catch (e) {}
   }
 
-  // Fallback to in-memory lookup by ID or normalized name slug
+  // Lookup in synchronized memory cache by ID or normalized name slug
   const leader = LEADERS_CACHE.find(l => 
     l.id === param || 
     l.id === cleanSlug ||
@@ -308,23 +148,9 @@ router.get('/:id', async (req, res) => {
   );
 
   if (!leader) {
-    return res.json({
-      id: cleanSlug,
-      name: param.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-      party: 'INDEPENDENT',
-      state: 'MH',
-      constituency: 'Constituency Registry',
-      type: 'MLA',
-      portfolio: 'Elected Representative',
-      agreeCount: 0,
-      funnyCount: 0,
-      openQuestionsCount: 0,
-      answeredCount: 0,
-      pendingCount: 0,
-      totalReactionsCount: 0,
-      totalCommentsCount: 0
-    });
+    return res.status(404).json({ error: 'Representative profile not found in database.' });
   }
+
   res.json(leader);
 });
 

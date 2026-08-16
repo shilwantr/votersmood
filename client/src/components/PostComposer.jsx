@@ -28,22 +28,25 @@ export default function PostComposer({ onPostCreated, openRegisterModal }) {
   
   // Open Question state
   const [isOpenQuestion, setIsOpenQuestion] = useState(false);
-  const [targetLeaderId, setTargetLeaderId] = useState('devendra-fadnavis');
-  const [targetLeaderName, setTargetLeaderName] = useState('Devendra Fadnavis (MLA)');
+  const [targetLeaderId, setTargetLeaderId] = useState('');
+  const [targetLeaderName, setTargetLeaderName] = useState('');
   const [questionCategory, setQuestionCategory] = useState('Water Supply');
 
-  // Leaders dropdown list
+  // Leaders dropdown list dynamically fetched from DB
   const [leaders, setLeaders] = useState([]);
 
   useEffect(() => {
-    api.getLeaders().then(res => {
+    api.getLeaders({ limit: 100 }).then(res => {
       const data = Array.isArray(res) ? res : (res.leaders || []);
       if (data && data.length > 0) {
-        setLeaders(data.map(l => ({
+        const formatted = data.map(l => ({
           value: l.id,
           label: `${l.name} (${l.party} • ${l.constituency})`,
           rawName: `${l.name} (${l.type || l.repType})`
-        })));
+        }));
+        setLeaders(formatted);
+        setTargetLeaderId(formatted[0].value);
+        setTargetLeaderName(formatted[0].rawName);
       }
     }).catch(() => {});
   }, []);
@@ -71,8 +74,8 @@ export default function PostComposer({ onPostCreated, openRegisterModal }) {
         targetLeaderId: isOpenQuestion ? targetLeaderId : null,
         targetLeaderName: isOpenQuestion ? targetLeaderName : null,
         questionCategory: isOpenQuestion ? questionCategory : null,
-        leaderTag: isOpenQuestion ? targetLeaderName.toUpperCase() : 'DEVENDRA FADNAVIS (MLA)',
-        topicTag: 'MAHARASHTRAELECTIONS2026',
+        leaderTag: isOpenQuestion ? targetLeaderName.toUpperCase() : 'GENERAL FEEDBACK',
+        topicTag: 'POLITICALDISCUSSIONS',
       });
 
       setContent('');
@@ -153,18 +156,14 @@ export default function PostComposer({ onPostCreated, openRegisterModal }) {
                 ATTACH POLITICAL LEADER
               </label>
               <SearchableSelect
-                options={leaders.length > 0 ? leaders : [
-                  { value: 'devendra-fadnavis', label: 'Devendra Fadnavis (BJP • Nagpur South West)', rawName: 'Devendra Fadnavis (MLA)' },
-                  { value: 'rahul-gandhi', label: 'Rahul Gandhi (INC • Rae Bareli)', rawName: 'Rahul Gandhi (MP_LS)' },
-                  { value: 'nitin-gadkari', label: 'Nitin Gadkari (BJP • Nagpur)', rawName: 'Nitin Gadkari (MP_LS)' }
-                ]}
+                options={leaders}
                 value={targetLeaderId}
                 onChange={(val) => {
                   setTargetLeaderId(val);
                   const found = leaders.find(l => l.value === val);
                   if (found) setTargetLeaderName(found.rawName || found.label);
                 }}
-                placeholder="Search Leader..."
+                placeholder="Search Representative from DB..."
               />
             </div>
 

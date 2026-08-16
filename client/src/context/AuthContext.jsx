@@ -72,14 +72,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signup = async (name, email, password, state, constituency, isRegistered) => {
+  const signup = async (
+    name, 
+    email, 
+    password, 
+    state, 
+    constituency, 
+    isRegistered, 
+    district, 
+    block
+  ) => {
     try {
       const res = await api.signup({
         name,
         email,
         password,
         state: state || 'MH',
-        constituency: constituency || 'Mumbai South',
+        district: district || 'Nagpur',
+        block: block || 'Nagpur Urban',
+        constituency: constituency || 'Nagpur South West',
         isRegisteredVoter: isRegistered !== false
       });
 
@@ -98,7 +109,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const loginWithGoogle = async (state = 'MH', constituency = 'Mumbai South') => {
+  const loginWithGoogle = async (
+    state = 'MH', 
+    constituency = 'Nagpur South West', 
+    district = 'Nagpur', 
+    block = 'Nagpur Urban'
+  ) => {
     try {
       // Trigger Google popup window to select logged in Gmail account
       const result = await signInWithPopup(auth, googleProvider);
@@ -113,12 +129,14 @@ export const AuthProvider = ({ children }) => {
         // Attempt login if Google user already registered
         res = await api.login({ email, password });
       } catch (loginErr) {
-        // Otherwise register new profile with Google account details
+        // Otherwise register new profile with Google account details & location metadata
         res = await api.signup({
           name,
           email,
           password,
           state,
+          district,
+          block,
           constituency,
           isRegisteredVoter: true
         });

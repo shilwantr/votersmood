@@ -9,19 +9,19 @@ const router = express.Router();
 let IN_MEMORY_POSTS = [
   {
     id: 'w3k9tvLmOzjT4GxYaSkp',
-    content: 'When will the 24x7 water pipeline augmentation project in South Mumbai be fully commissioned? Citizens are experiencing low pressure during morning supply hours.',
+    content: 'When will the 24x7 water pipeline augmentation project in our constituency be fully commissioned? Citizens are experiencing low pressure during morning supply hours.',
     authorId: 'voter_1',
     authorName: 'SURESH PATIL',
     authorAvatar: 'https://api.dicebear.com/10.x/avataaars/svg?seed=Suresh',
     isVerified: true,
     isOpenQuestion: true,
-    targetLeaderId: 'devendra-fadnavis',
-    targetLeaderName: 'Devendra Fadnavis (MLA)',
+    targetLeaderId: null,
+    targetLeaderName: 'Elected Representative',
     questionCategory: 'Water Supply',
     responseStatus: 'pending',
     officialResponse: null,
-    leaderTag: 'DEVENDRA FADNAVIS (MLA)',
-    topicTag: 'MAHARASHTRAELECTIONS2026',
+    leaderTag: 'CONSTITUENCY QUESTION',
+    topicTag: 'CITIZENVOICE',
     poll: null,
     agreeCount: 1,
     funnyCount: 0,
@@ -154,7 +154,7 @@ router.post('/', verifyAuthToken, requireAuth, async (req, res) => {
     };
   }
 
-  const effectiveLeaderId = targetLeaderId || (isOpenQuestion ? 'devendra-fadnavis' : null);
+  const effectiveLeaderId = targetLeaderId || null;
 
   const newPost = {
     content: content.trim(),
@@ -165,12 +165,12 @@ router.post('/', verifyAuthToken, requireAuth, async (req, res) => {
     streakCount: streakInfo?.streakCount || 1,
     isOpenQuestion: !!isOpenQuestion,
     targetLeaderId: effectiveLeaderId,
-    targetLeaderName: targetLeaderName || (isOpenQuestion ? 'Devendra Fadnavis (MLA)' : null),
+    targetLeaderName: targetLeaderName || (isOpenQuestion ? 'Elected Representative' : null),
     questionCategory: questionCategory || 'General Infrastructure',
     responseStatus: isOpenQuestion ? 'pending' : null,
     officialResponse: null,
-    leaderTag: leaderTag || (targetLeaderName ? targetLeaderName.toUpperCase() : 'DEVENDRA FADNAVIS (MLA)'),
-    topicTag: (topicTag || 'MAHARASHTRAELECTIONS2026').replace(/^#/, '').toUpperCase(),
+    leaderTag: leaderTag || (targetLeaderName ? targetLeaderName.toUpperCase() : 'GENERAL FEEDBACK'),
+    topicTag: (topicTag || 'POLITICALDISCUSSIONS').replace(/^#/, '').toUpperCase(),
     poll: formattedPoll,
     agreeCount: 0,
     funnyCount: 0,

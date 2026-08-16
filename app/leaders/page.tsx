@@ -1,67 +1,11 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { STATES, PARTIES, LEADER_TYPES } from '@/data/states';
 import styles from './page.module.css';
-
-const SAMPLE_LEADERS = [
-  {
-    id: 'devendra-fadnavis',
-    name: 'Devendra Fadnavis',
-    party: 'BJP',
-    state: 'MH',
-    constituency: 'Nagpur South West',
-    type: 'MLA',
-    photoUrl: ''
-  },
-  {
-    id: 'rahul-gandhi',
-    name: 'Rahul Gandhi',
-    party: 'INC',
-    state: 'UP',
-    constituency: 'Rae Bareli',
-    type: 'MP_LS',
-    photoUrl: ''
-  },
-  {
-    id: 'nitin-gadkari',
-    name: 'Nitin Gadkari',
-    party: 'BJP',
-    state: 'MH',
-    constituency: 'Nagpur',
-    type: 'MP_LS',
-    photoUrl: ''
-  },
-  {
-    id: 'shashi-tharoor',
-    name: 'Shashi Tharoor',
-    party: 'INC',
-    state: 'KL',
-    constituency: 'Thiruvananthapuram',
-    type: 'MP_LS',
-    photoUrl: ''
-  },
-  {
-    id: 'akhilesh-yadav',
-    name: 'Akhilesh Yadav',
-    party: 'SP',
-    state: 'UP',
-    constituency: 'Kannauj',
-    type: 'MP_LS',
-    photoUrl: ''
-  },
-  {
-    id: 'mamata-banerjee',
-    name: 'Mamata Banerjee',
-    party: 'AITC',
-    state: 'WB',
-    constituency: 'Bhabanipur',
-    type: 'MLA',
-    photoUrl: ''
-  }
-];
 
 export default function LeadersDirectory() {
   const [leaders, setLeaders] = useState<any[]>([]);
@@ -84,20 +28,18 @@ export default function LeadersDirectory() {
       if (selectedParty) constraints.push(where('party', '==', selectedParty));
       if (selectedType) constraints.push(where('type', '==', selectedType));
       
-      const qRef = query(q, ...constraints);
+      const qRef = query(q, ...constraints, limit(100));
       const snapshot = await getDocs(qRef);
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setLeaders(data);
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching leaders from DB:', error);
     }
     setLoading(false);
   };
 
-  const displayList = leaders.length > 0 ? leaders : SAMPLE_LEADERS;
-
-  const filteredLeaders = displayList.filter(l => {
-    const matchesSearch = !search || l.name.toLowerCase().includes(search.toLowerCase()) || l.constituency.toLowerCase().includes(search.toLowerCase());
+  const filteredLeaders = leaders.filter(l => {
+    const matchesSearch = !search || (l.name && l.name.toLowerCase().includes(search.toLowerCase())) || (l.constituency && l.constituency.toLowerCase().includes(search.toLowerCase()));
     const matchesState = !selectedState || l.state === selectedState;
     const matchesParty = !selectedParty || l.party === selectedParty;
     const matchesType = !selectedType || l.type === selectedType;
@@ -108,7 +50,7 @@ export default function LeadersDirectory() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h1 className={styles.title}>🗂️ Political Representatives Directory</h1>
-        <p className={styles.subtitle}>ELECTED MLAS, MLCS, AND LOK SABHA / RAJYA SABHA MEMBERS</p>
+        <p className={styles.subtitle}>VERIFIED MLAS, MLCS, AND LOK SABHA / RAJYA SABHA MEMBERS FROM DB</p>
       </div>
       
       <div className={styles.filters}>
@@ -133,19 +75,21 @@ export default function LeadersDirectory() {
         </select>
       </div>
 
-      {loading && leaders.length === 0 ? (
-        <div className={styles.loading}>LOADING REPRESENTATIVES DIRECTORY...</div>
+      {loading ? (
+        <div className={styles.loading}>LOADING REPRESENTATIVES DIRECTORY FROM DB...</div>
+      ) : filteredLeaders.length === 0 ? (
+        <div className={styles.loading}>No elected representatives match your search criteria.</div>
       ) : (
         <div className={styles.grid}>
           {filteredLeaders.map(leader => (
             <Link href={`/leaders/${leader.id}`} key={leader.id} className={styles.cardLink}>
               <div className={styles.card}>
                 <div className={styles.photoContainer}>
-                  {leader.photoUrl ? (
-                    <img src={leader.photoUrl} alt={leader.name} className={styles.photo} />
+                  {leader.profilePhoto || leader.photoUrl ? (
+                    <img src={leader.profilePhoto || leader.photoUrl} alt={leader.name} className={styles.photo} />
                   ) : (
                     <div className={styles.placeholderPhoto}>
-                      {leader.name.split(' ').map((n: string) => n[0]).join('')}
+                      {leader.name ? leader.name.split(' ').map((n: string) => n[0]).join('') : 'L'}
                     </div>
                   )}
                 </div>
@@ -153,7 +97,7 @@ export default function LeadersDirectory() {
                   <h3 className={styles.name}>{leader.name}</h3>
                   <div className={styles.badges}>
                     <span className={styles.partyBadge}>{leader.party}</span>
-                    <span className={styles.typeBadge}>{leader.type}</span>
+                    <span className={styles.typeBadge}>{leader.type || leader.repType}</span>
                   </div>
                   <p className={styles.location}>📍 {leader.constituency}, {leader.state}</p>
                 </div>

@@ -2,10 +2,22 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useAuth } from '@/providers/AuthProvider';
 import { STATES } from '@/data/states';
 import styles from './page.module.css';
+
+// District fallback dictionary for Next.js app
+const DISTRICTS_MAP: Record<string, string[]> = {
+  MH: ['Nagpur', 'Mumbai City', 'Mumbai Suburban', 'Pune', 'Thane', 'Nashik', 'Chhatrapati Sambhajinagar', 'Solapur', 'Kolhapur', 'Ahmednagar'],
+  UP: ['Agra', 'Aligarh', 'Allahabad (Prayagraj)', 'Amethi', 'Azamgarh', 'Bareilly', 'Basti', 'Gorakhpur', 'Kanpur Nagar', 'Lucknow', 'Mathura', 'Meerut', 'Noida', 'Varanasi'],
+  WB: ['Kolkata', 'North 24 Parganas', 'South 24 Parganas', 'Howrah', 'Hooghly', 'Darjeeling', 'Jalpaiguri', 'Paschim Bardhaman', 'Murshidabad'],
+  BR: ['Patna', 'Gaya', 'Muzaffarpur', 'Bhagalpur', 'Darbhanga', 'Begusarai', 'Nalanda', 'Kishanganj'],
+  TN: ['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem', 'Tirunelveli', 'Thanjavur'],
+  KA: ['Bengaluru Urban', 'Bengaluru Rural', 'Mysuru', 'Mangaluru', 'Belagavi', 'Hubballi-Dharwad'],
+  TG: ['Hyderabad', 'Medchal-Malkajgiri', 'Ranga Reddy', 'Karimnagar', 'Warangal'],
+  GJ: ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Gandhinagar'],
+  DL: ['New Delhi', 'Central Delhi', 'East Delhi', 'South Delhi', 'West Delhi', 'North Delhi']
+};
 
 export default function SignupPage() {
   const router = useRouter();
@@ -14,11 +26,35 @@ export default function SignupPage() {
   const [name, setName] = useState('Anand Verma');
   const [email, setEmail] = useState('anand.v@example.com');
   const [password, setPassword] = useState('password123');
+  
+  // Cascading Location state: State -> District -> Block -> Voting Constituency
   const [state, setState] = useState('MH');
-  const [constituency, setConstituency] = useState('Mumbai South');
+  const [district, setDistrict] = useState('Nagpur');
+  const [block, setBlock] = useState('Nagpur Urban');
+  const [constituency, setConstituency] = useState('Nagpur South West');
+
   const [isRegistered, setIsRegistered] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const getDistricts = (stCode: string) => {
+    return DISTRICTS_MAP[stCode] || [`${stCode} Central District`, `${stCode} North District`, `${stCode} South District`, 'Capital District'];
+  };
+
+  const handleStateChange = (newCode: string) => {
+    setState(newCode);
+    const dists = getDistricts(newCode);
+    const defaultDist = dists[0] || '';
+    setDistrict(defaultDist);
+    setBlock(`${defaultDist} Urban Block`);
+    setConstituency(`${defaultDist} Central`);
+  };
+
+  const handleDistrictChange = (newDist: string) => {
+    setDistrict(newDist);
+    setBlock(`${newDist} Block`);
+    setConstituency(`${newDist} Main`);
+  };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +91,7 @@ export default function SignupPage() {
         'demoPass123', 
         'Anand Verma (Verified Voter)', 
         'MH', 
-        'Mumbai South', 
+        'Nagpur South West', 
         true
       );
       router.push('/');
@@ -68,7 +104,7 @@ export default function SignupPage() {
 
   return (
     <div className={styles.overlay}>
-      <div className={styles.modal}>
+      <div className={styles.modal} style={{ maxWidth: '560px' }}>
         <button className={styles.closeBtn} onClick={() => router.push('/')} aria-label="Close">✕</button>
         
         <div className={styles.header}>
@@ -76,16 +112,16 @@ export default function SignupPage() {
             🔒 REGISTRATION GAZETTE
           </div>
           <h2 className={styles.title}>Register as Verified Citizen</h2>
-          <p className={styles.subtitle}>Sign up with Email or Google to post & vote in constituency polls.</p>
+          <p className={styles.subtitle}>Select State → District → Block → Voting Constituency for verified voter badges.</p>
         </div>
 
         <div className={styles.body}>
           <div className={styles.noticeBox}>
             <div className={styles.noticeTitle}>
-              🛡 STATE & CONSTITUENCY REGISTRY NOTICE:
+              🛡 STATE, DISTRICT & CONSTITUENCY REGISTRY NOTICE:
             </div>
             <p className={styles.noticeText}>
-              JanMat segregates poll votes into Local Residents vs Outside Observers.
+              JanMat segregates poll votes into Local Residents vs Outside Observers based on your verified constituency.
             </p>
           </div>
 
@@ -128,32 +164,65 @@ export default function SignupPage() {
               />
             </div>
 
-            <div className={styles.twoColumn}>
-              <div className={styles.field}>
-                <label className={styles.label}>HOME STATE</label>
-                <select
-                  value={state}
-                  onChange={(e) => setState(e.target.value)}
-                  required
-                  className={styles.input}
-                >
-                  <option value="">Select State</option>
-                  {STATES?.map((s) => (
-                    <option key={s.code} value={s.code}>{s.name.toUpperCase()}</option>
-                  ))}
-                </select>
+            {/* 4-Field Location Grid: State -> District -> Block -> Voting Constituency */}
+            <div style={{ backgroundColor: '#F8FAFC', border: '1px solid #CBD5E1', borderRadius: '8px', padding: '12px', marginBottom: '14px' }}>
+              <div style={{ fontFamily: 'monospace', fontSize: '11px', fontWeight: 800, color: '#0F172A', marginBottom: '8px' }}>
+                🏛 CASCADING LOCATION REGISTRATION:
               </div>
 
-              <div className={styles.field}>
-                <label className={styles.label}>CONSTITUENCY</label>
-                <input
-                  type="text"
-                  value={constituency}
-                  onChange={(e) => setConstituency(e.target.value)}
-                  required
-                  className={styles.input}
-                  placeholder="Mumbai South"
-                />
+              <div className={styles.twoColumn} style={{ marginBottom: '10px' }}>
+                <div className={styles.field}>
+                  <label className={styles.label}>1. HOME STATE *</label>
+                  <select
+                    value={state}
+                    onChange={(e) => handleStateChange(e.target.value)}
+                    required
+                    className={styles.input}
+                  >
+                    {STATES?.map((s) => (
+                      <option key={s.code} value={s.code}>{s.name.toUpperCase()}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className={styles.field}>
+                  <label className={styles.label}>2. DISTRICT *</label>
+                  <select
+                    value={district}
+                    onChange={(e) => handleDistrictChange(e.target.value)}
+                    required
+                    className={styles.input}
+                  >
+                    {getDistricts(state).map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className={styles.twoColumn}>
+                <div className={styles.field}>
+                  <label className={styles.label}>3. BLOCK / TEHSIL</label>
+                  <input
+                    type="text"
+                    value={block}
+                    onChange={(e) => setBlock(e.target.value)}
+                    className={styles.input}
+                    placeholder="Nagpur Urban"
+                  />
+                </div>
+
+                <div className={styles.field}>
+                  <label className={styles.label}>4. VOTING CONSTITUENCY *</label>
+                  <input
+                    type="text"
+                    value={constituency}
+                    onChange={(e) => setConstituency(e.target.value)}
+                    required
+                    className={styles.input}
+                    placeholder="Nagpur South West"
+                  />
+                </div>
               </div>
             </div>
 

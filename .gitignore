@@ -32,3 +32,8 @@ yarn-error.log*
 Thumbs.db
 .vscode/
 .idea/
+
+# Data import dumps & scratch data
+*.csv
+*_imported.json
+server/data/locations_master.json

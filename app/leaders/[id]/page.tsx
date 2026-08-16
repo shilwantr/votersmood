@@ -1,49 +1,11 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 import styles from './page.module.css';
 import Link from 'next/link';
-
-const SAMPLE_PROFILES: { [key: string]: any } = {
-  'devendra-fadnavis': {
-    id: 'devendra-fadnavis',
-    name: 'Devendra Fadnavis',
-    party: 'BJP',
-    state: 'MH',
-    constituency: 'Nagpur South West',
-    type: 'MLA',
-    agreeCount: 142,
-    funnyCount: 12,
-  },
-  'rahul-gandhi': {
-    id: 'rahul-gandhi',
-    name: 'Rahul Gandhi',
-    party: 'INC',
-    state: 'UP',
-    constituency: 'Rae Bareli',
-    type: 'MP_LS',
-    agreeCount: 230,
-    funnyCount: 45,
-  },
-  'nitin-gadkari': {
-    id: 'nitin-gadkari',
-    name: 'Nitin Gadkari',
-    party: 'BJP',
-    state: 'MH',
-    constituency: 'Nagpur',
-    type: 'MP_LS',
-    agreeCount: 310,
-    funnyCount: 5,
-  }
-};
-
-const SAMPLE_RELATED = [
-  { id: 'nitin-gadkari', name: 'Nitin Gadkari', party: 'BJP' },
-  { id: 'rahul-gandhi', name: 'Rahul Gandhi', party: 'INC' },
-  { id: 'shashi-tharoor', name: 'Shashi Tharoor', party: 'INC' }
-];
 
 export default function LeaderProfile() {
   const { id } = useParams() as { id: string };
@@ -67,76 +29,66 @@ export default function LeaderProfile() {
       
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setLeader({ id: docSnap.id, ...data });
+        const leaderObj = { id: docSnap.id, ...data };
+        setLeader(leaderObj);
         
-        const postsQuery = query(collection(db, 'posts'), where('leaderId', '==', id));
+        // Fetch posts linked to this leader from DB
+        const postsQuery = query(collection(db, 'posts'), where('targetLeaderId', '==', id));
         const postsSnap = await getDocs(postsQuery);
         setPosts(postsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
         
+        // Fetch polls linked to this leader from DB
         const pollsQuery = query(collection(db, 'polls'), where('leaderId', '==', id));
         const pollsSnap = await getDocs(pollsQuery);
         setPolls(pollsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+
+        // Fetch related leaders in same state from DB
+        if (data.state) {
+          const relQuery = query(collection(db, 'leaders'), where('state', '==', data.state), limit(4));
+          const relSnap = await getDocs(relQuery);
+          const relList = relSnap.docs
+            .map(d => ({ id: d.id, ...d.data() }))
+            .filter(r => r.id !== id);
+          setRelated(relList);
+        }
       } else {
-        // Fallback for sample profile
-        const sample = SAMPLE_PROFILES[id] || {
-          id,
-          name: id.replace(/-/g, ' ').toUpperCase(),
-          party: 'INDEPENDENT',
-          state: 'NATIONAL',
-          constituency: 'Constituency Registry',
-          type: 'MLA',
-          agreeCount: 45,
-          funnyCount: 3
-        };
-        setLeader(sample);
-        setRelated(SAMPLE_RELATED.filter(r => r.id !== id));
+        setLeader(null);
       }
     } catch (error) {
-      console.warn("Using leader fallback profile:", error);
-      const sample = SAMPLE_PROFILES[id] || {
-        id,
-        name: id.replace(/-/g, ' ').toUpperCase(),
-        party: 'INDEPENDENT',
-        state: 'NATIONAL',
-        constituency: 'Constituency Registry',
-        type: 'MLA',
-        agreeCount: 45,
-        funnyCount: 3
-      };
-      setLeader(sample);
-      setRelated(SAMPLE_RELATED.filter(r => r.id !== id));
+      console.warn("Error fetching leader profile from DB:", error);
+      setLeader(null);
     }
     setLoading(false);
   };
 
-  if (loading) return <div className={styles.loading}>LOADING REPRESENTATIVE PROFILE...</div>;
-  if (!leader) return <div className={styles.loading}>Leader profile not found.</div>;
+  if (loading) return <div className={styles.loading}>LOADING REPRESENTATIVE PROFILE FROM DB...</div>;
+  if (!leader) return <div className={styles.loading}>Representative profile not found in database.</div>;
 
   return (
     <div className={styles.container}>
       <div className={styles.mainContent}>
         <div className={styles.profileHeader}>
           <div className={styles.photoContainer}>
-            {leader.photoUrl ? (
-              <img src={leader.photoUrl} alt={leader.name} className={styles.photo} />
+            {leader.profilePhoto || leader.photoUrl ? (
+              <img src={leader.profilePhoto || leader.photoUrl} alt={leader.name} className={styles.photo} />
             ) : (
-              <div>{leader.name.split(' ').map((n: string) => n[0]).join('')}</div>
+              <div>{leader.name ? leader.name.split(' ').map((n: string) => n[0]).join('') : 'L'}</div>
             )}
           </div>
           <div className={styles.headerInfo}>
             <h1 className={styles.name}>{leader.name}</h1>
             <div className={styles.badges}>
               <span className={styles.partyBadge}>{leader.party}</span>
-              <span className={styles.typeBadge}>{leader.type}</span>
+              <span className={styles.typeBadge}>{leader.type || leader.repType}</span>
             </div>
             <p className={styles.location}>📍 {leader.constituency}, {leader.state}</p>
             <div className={styles.stats}>
               <div className={styles.statBox}>
-                <span className={styles.statValue}>{leader.agreeCount || leader.reactions?.agree || 0}</span>
+                <span className={styles.statValue}>{leader.agreeCount || 0}</span>
                 <span className={styles.statLabel}>AGREE</span>
               </div>
               <div className={styles.statBox}>
-                <span className={styles.statValue}>{leader.funnyCount || leader.reactions?.funny || 0}</span>
+                <span className={styles.statValue}>{leader.funnyCount || 0}</span>
                 <span className={styles.statLabel}>FUNNY</span>
               </div>
             </div>
@@ -174,22 +126,24 @@ export default function LeaderProfile() {
         </div>
       </div>
 
-      <div className={styles.sidebar}>
-        <h2 className={styles.sidebarTitle}>Related Representatives</h2>
-        <div className={styles.relatedList}>
-          {(related.length > 0 ? related : SAMPLE_RELATED).map(rel => (
-            <Link href={`/leaders/${rel.id}`} key={rel.id} className={styles.relatedCard}>
-              <div className={styles.relatedPhoto}>
-                {rel.name.split(' ').map((n: string) => n[0]).join('')}
-              </div>
-              <div className={styles.relatedInfo}>
-                <h4 className={styles.relatedName}>{rel.name}</h4>
-                <p className={styles.relatedParty}>{rel.party}</p>
-              </div>
-            </Link>
-          ))}
+      {related.length > 0 && (
+        <div className={styles.sidebar}>
+          <h2 className={styles.sidebarTitle}>Related Representatives ({leader.state})</h2>
+          <div className={styles.relatedList}>
+            {related.map(rel => (
+              <Link href={`/leaders/${rel.id}`} key={rel.id} className={styles.relatedCard}>
+                <div className={styles.relatedPhoto}>
+                  {rel.name ? rel.name.split(' ').map((n: string) => n[0]).join('') : 'L'}
+                </div>
+                <div className={styles.relatedInfo}>
+                  <h4 className={styles.relatedName}>{rel.name}</h4>
+                  <p className={styles.relatedParty}>{rel.party}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

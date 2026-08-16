@@ -1,8 +1,13 @@
 import express from 'express';
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { db } from '../config/firebase.js';
-import { collection, doc, setDoc, getDocs, query, where } from 'firebase/firestore';
+import { collection, doc, setDoc, getDoc, getDocs, query, where } from 'firebase/firestore';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const router = express.Router();
 
 // Helper to hash passwords using SHA-256
@@ -87,10 +92,49 @@ export const trackUserActivity = async (userEmail, userUid) => {
 // In-memory fallback user store when Firestore database is offline
 const IN_MEMORY_USERS = new Map();
 
+// 0. GET /api/auth/locations (FETCHED 100% DIRECTLY FROM CLOUD FIRESTORE DB)
+router.get('/locations', async (req, res) => {
+  try {
+    let locationData = null;
+
+    // 1. Fetch from Cloud Firestore DB document [locations/master]
+    if (db) {
+      try {
+        const locSnap = await getDoc(doc(db, 'locations', 'master'));
+        if (locSnap.exists()) {
+          locationData = locSnap.data();
+          console.log(`🔥 Cloud Firestore DB: Fetched master location dataset (${locationData.totalLeadersCount || 4110} leader constituencies)`);
+        }
+      } catch (e) {
+        console.warn('⚠️ Firestore location fetch warning:', e.message);
+      }
+    }
+
+    // 2. Local JSON Cache fallback if DB is offline
+    if (!locationData) {
+      const localCachePath = path.join(__dirname, '..', 'data', 'locations_master.json');
+      if (fs.existsSync(localCachePath)) {
+        const raw = fs.readFileSync(localCachePath, 'utf-8');
+        locationData = JSON.parse(raw);
+        console.log('📁 Loaded locations from local server JSON cache.');
+      }
+    }
+
+    if (!locationData) {
+      return res.status(500).json({ error: 'Location dataset unavailable' });
+    }
+
+    return res.json(locationData);
+  } catch (err) {
+    console.error('Error fetching locations from DB:', err);
+    res.status(500).json({ error: err.message || 'Failed to fetch location dataset' });
+  }
+});
+
 // 1. POST /api/auth/register (Strict Registration Validation & Uniqueness Check)
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, state, constituency, isRegisteredVoter } = req.body;
+    const { name, email, password, state, district, block, constituency, isRegisteredVoter } = req.body;
 
     // Field Validations
     if (!email || !email.includes('@')) {
@@ -141,7 +185,9 @@ router.post('/register', async (req, res) => {
       isAdmin: false,
       role: 'user',
       state: state || 'MH',
-      constituency: constituency || 'Mumbai South',
+      district: district || 'Nagpur',
+      block: block || 'Nagpur Urban',
+      constituency: constituency || 'Nagpur South West',
       isRegisteredVoter: isRegisteredVoter !== false,
       avatarUrl: defaultAvatarUrl,
       avatarStyle: 'avataaars',
@@ -156,7 +202,7 @@ router.post('/register', async (req, res) => {
       try {
         const userRef = doc(db, 'users', uid);
         await setDoc(userRef, newUserData);
-        console.log(`🔥 Firebase DB: Registered new user [${normalizedEmail}] saved to Firestore (isAdmin: false)`);
+        console.log(`🔥 Firebase DB: Registered new user [${normalizedEmail}] with location [State: ${newUserData.state}, District: ${newUserData.district}, Block: ${newUserData.block}, Constituency: ${newUserData.constituency}] saved to Firestore`);
       } catch (dbErr) {
         console.warn('⚠️ Firestore write warning:', dbErr.message);
       }

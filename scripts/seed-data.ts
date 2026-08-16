@@ -25,58 +25,7 @@ async function seedData() {
   });
   console.log('✔ Seeded App Config');
 
-  // 2. Initial Sample Leaders
-  const sampleLeaders = [
-    {
-      id: 'devendra-fadnavis',
-      name: 'Devendra Fadnavis',
-      party: 'BJP',
-      state: 'MH',
-      constituency: 'Nagpur South West',
-      type: 'MLA',
-      chamber: 'Vidhan Sabha',
-      agreeCount: 142,
-      funnyCount: 12,
-      commentCount: 8,
-      searchTokens: ['devendra', 'fadnavis', 'nagpur', 'bjp', 'mla', 'maharashtra'],
-      createdAt: Date.now(),
-    },
-    {
-      id: 'rahul-gandhi',
-      name: 'Rahul Gandhi',
-      party: 'INC',
-      state: 'UP',
-      constituency: 'Rae Bareli',
-      type: 'MP_LS',
-      chamber: 'Lok Sabha',
-      agreeCount: 230,
-      funnyCount: 45,
-      commentCount: 34,
-      searchTokens: ['rahul', 'gandhi', 'rae bareli', 'inc', 'mp', 'lok sabha'],
-      createdAt: Date.now(),
-    },
-    {
-      id: 'nitin-gadkari',
-      name: 'Nitin Gadkari',
-      party: 'BJP',
-      state: 'MH',
-      constituency: 'Nagpur',
-      type: 'MP_LS',
-      chamber: 'Lok Sabha',
-      agreeCount: 310,
-      funnyCount: 5,
-      commentCount: 19,
-      searchTokens: ['nitin', 'gadkari', 'nagpur', 'bjp', 'mp', 'lok sabha'],
-      createdAt: Date.now(),
-    }
-  ];
-
-  for (const leader of sampleLeaders) {
-    await setDoc(doc(db, 'leaders', leader.id), leader);
-  }
-  console.log('✔ Seeded Sample Leaders');
-
-  // 3. Initial Topics
+  // 2. Initial Topics
   const sampleTopics = [
     {
       id: 'maharashtra-elections-2026',
@@ -117,7 +66,7 @@ async function seedData() {
   }
   console.log('✔ Seeded Sample Topics');
 
-  // 4. Initial Featured Election Polls
+  // 3. Initial Featured Election Polls
   const samplePolls = [
     {
       question: 'Priority Focus for Next Maharashtra Assembly Elections?',
