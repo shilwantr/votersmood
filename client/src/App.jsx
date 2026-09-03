@@ -26,12 +26,17 @@ function AppContent() {
         setActiveTab('discussions');
         setSelectedLeaderSlug(null);
         document.title = "JanMat | Political Intelligence & Verified Constituency Portal";
+      } else if (path.startsWith('directory/')) {
+        // e.g. /directory/devendra-fadnavis
+        const slug = path.split('directory/')[1];
+        setSelectedLeaderSlug(slug);
+        setActiveTab('leader-detail');
       } else if (KNOWN_TABS.includes(path)) {
         setActiveTab(path);
         setSelectedLeaderSlug(null);
         document.title = `JanMat Gazette • ${path.toUpperCase()}`;
       } else {
-        // SEO Leader Slug URL e.g. /devendra-fadnavis or /rahul-gandhi
+        // Fallback for old URLs (e.g. /rahul-gandhi) so existing links don't break
         setSelectedLeaderSlug(path);
         setActiveTab('leader-detail');
       }
@@ -44,12 +49,12 @@ function AppContent() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // SEO-friendly Navigation to Leader Page (e.g. /devendra-fadnavis)
+  // SEO-friendly Navigation to Leader Page (e.g. /directory/devendra-fadnavis)
   const handleSelectLeader = (leaderIdOrSlug) => {
     const cleanSlug = String(leaderIdOrSlug).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
     setSelectedLeaderSlug(cleanSlug);
     setActiveTab('leader-detail');
-    window.history.pushState({}, '', `/${cleanSlug}`);
+    window.history.pushState({}, '', `/directory/${cleanSlug}`);
   };
 
   const handleTabChange = (tab) => {

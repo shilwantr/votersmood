@@ -93481,7 +93481,49 @@
       "Leader of Opposition"
     ],
     "state": "Uttar Pradesh",
-    "openQuestionsCount": 38
+    "openQuestionsCount": 38,
+    "careerTimeline": [
+      {
+        "year": "2004",
+        "title": "Member of Parliament (Lok Sabha)",
+        "description": "Contested and won the 14th general elections from Amethi, Uttar Pradesh, securing a victory by over 100,000 votes."
+      },
+      {
+        "year": "2004 - 2006",
+        "title": "Standing Committee on Home Affairs",
+        "description": "Served as a member of the Standing Committee on Home Affairs."
+      },
+      {
+        "year": "2006 - 2009",
+        "title": "Standing Committee on HRD",
+        "description": "Served as a member of the Standing Committee on Human Resource Development."
+      },
+      {
+        "year": "2007",
+        "title": "General Secretary (AICC)",
+        "description": "Appointed as the general secretary of the All India Congress Committee (AICC) and given charge of the Indian Youth Congress (IYC) and NSUI."
+      },
+      {
+        "year": "2009",
+        "title": "Retained Amethi Seat",
+        "description": "Won the 2009 Indian general election from Amethi by a massive margin of over 370,000 votes."
+      },
+      {
+        "year": "2014",
+        "title": "Vice-President of INC",
+        "description": "Named Vice-President of the Indian National Congress. Retained the Amethi Lok Sabha seat by defeating Smriti Irani."
+      },
+      {
+        "year": "2019",
+        "title": "Member of Parliament, Wayanad",
+        "description": "Won the Wayanad Lok Sabha seat in Kerala with over 60% vote share. Led the national election campaign."
+      },
+      {
+        "year": "2024",
+        "title": "Leader of Opposition, Lok Sabha",
+        "description": "Won the Rae Bareli constituency. Assumed the constitutional role of Leader of the Official Opposition in the Lok Sabha."
+      }
+    ]
   },
   {
     "id": "rahul-kumar",
