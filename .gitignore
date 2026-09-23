@@ -1,3 +1,4 @@
+��
 # Dependencies
 node_modules/
 **/node_modules/
@@ -37,3 +38,12 @@ Thumbs.db
 *.csv
 *_imported.json
 server/data/locations_master.json
+server/data/leaders_cache.json
+
+
+
+
+node_modules/
+client/node_modules/
+server/node_modules/
+.env
