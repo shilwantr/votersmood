@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { api } from '../api/client';
 import { db } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -17,7 +18,16 @@ const CustomXAxisTick = ({ x, y, payload }) => {
 };
 
 export default function ElectionsHub({ onSelectYear }) {
+  useEffect(() => {
+    let isMounted = true;
+    api.getLiveElections().then(data => {
+      if (isMounted) setLiveElections(data || []);
+    }).catch(e => console.error(e));
+    return () => { isMounted = false; };
+  }, []);
+
   const [loading, setLoading] = useState(true);
+  const [liveElections, setLiveElections] = useState([]);
   const [electionType, setElectionType] = useState('LOK_SABHA');
   
   // Lok Sabha State
@@ -220,14 +230,14 @@ export default function ElectionsHub({ onSelectYear }) {
         </div>
       </div>
 
-      {!isLS && (
+      {!isLS && !isAS && (
         <div style={{ textAlign: 'center', padding: '40px', backgroundColor: '#27272A', borderRadius: '12px', color: '#A1A1AA', marginBottom: '24px' }}>
           <h3 style={{ color: '#FFFFFF', fontSize: '20px', marginBottom: '8px' }}>Module Active</h3>
           <p>This section is currently being mapped with historical data.</p>
         </div>
       )}
 
-      {isLS && (<>
+      {(isLS || isAS) && (<>
       {/* TOP CHART: ALL-TIME TREND */}
       <div style={{ backgroundColor: '#27272A', borderRadius: '12px', padding: '24px', marginBottom: '24px', height: '350px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -403,7 +413,7 @@ export default function ElectionsHub({ onSelectYear }) {
 
       {/* FLOATING ACTION BUTTON */}
       <button
-        onClick={() => onSelectYear(activeYear)}
+        onClick={() => onSelectYear(activeYear, isLS, selectedState)}
         style={{
           position: 'fixed',
           bottom: '40px',
